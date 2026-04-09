@@ -3,8 +3,8 @@ session_start();
 include '../includes/db_connection.php';
 include '../includes/user/auth.php';
 
-$page_title  = $page_title  ?? 'questionnaire';
-$active_page = $active_page ?? 'questionnaire';
+$page_title  = $page_title  ?? '';
+$active_page = $active_page ?? '';
 $is_admin    = false;
 ?>
 <!DOCTYPE html>

@@ -253,9 +253,6 @@ if ($q) {
         <span class="topbar-sep">›</span>
         <span class="topbar-page"><?= htmlspecialchars($page_title) ?></span>
       </div>
-      <div class="topbar-right">
-        <span class="topbar-user">@<?= htmlspecialchars($user_name) ?></span>
-      </div>
     </div>
 
     <div class="content-area">
@@ -419,11 +416,11 @@ if ($q) {
         </div>
         <?php endforeach; ?>
       </div>
-
+<!-- 
       <div style="max-width:900px;margin-top:24px;padding:14px 18px;background:var(--surface);border:.5px solid var(--border-md);border-radius:10px;font-size:12px;color:var(--text-muted);display:flex;gap:10px;align-items:flex-start;">
         <i class="fa-solid fa-triangle-exclamation" style="margin-top:1px;flex-shrink:0;"></i>
         <span>These recommendations are generated based on your questionnaire responses and are for <strong>informational purposes only</strong>. They do not substitute professional medical advice. Always consult a licensed healthcare provider or OB-GYN before choosing a contraceptive method.</span>
-      </div>
+      </div> -->
 
       <?php endif; ?>
     </div>

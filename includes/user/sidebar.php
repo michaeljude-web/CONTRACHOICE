@@ -22,8 +22,7 @@ $user_nav = [
   ['id' => 'forum',           'label' => 'Anonymous forum',    'icon' => 'chat'],
   ['id' => 'chatbot',         'label' => 'AI chatbot',         'icon' => 'bot'],
   ['section' => 'Account'],
-  ['id' => 'profile',         'label' => 'My profile',         'icon' => 'user'],
-  ['id' => 'history',         'label' => 'History',            'icon' => 'clock'],
+  ['id' => 'settings',        'label' => 'Settings',           'icon' => 'settings'],
 ];
 
 $admin_nav = [

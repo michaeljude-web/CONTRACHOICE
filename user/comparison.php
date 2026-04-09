@@ -568,9 +568,6 @@ $methods = [
         <span class="topbar-sep">›</span>
         <span class="topbar-page"><?= htmlspecialchars($page_title) ?></span>
       </div>
-      <div class="topbar-right">
-        <span class="topbar-user">@<?= htmlspecialchars($user_name ?? 'User') ?></span>
-      </div>
     </div>
     <div class="content-area" id="cc-content">
       <div class="page-header">
