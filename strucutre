@@ -1,0 +1,31 @@
+project/
+├── config/
+│   └── database.php
+├── includes/
+│   ├── user/
+│   │   └── auth.php
+│   ├── admin/
+│   │   └── auth.php
+│   ├── user/
+│   └── admin/
+├── admin/
+│   └── dashboard.php
+├── user/
+│   └── dashboard.php
+├── assets/
+│   ├── css/
+│   │   ├── admin/
+│   │   │   └── style.css
+│   │   └── user/
+│   │       └── style.css
+│   ├── js/
+│   │   ├── admin/
+│   │   └── user/
+│   ├── images/
+│   └── vendor/
+│       ├── fontawesome-7/
+│       └── bootstrap-5/
+├── uploads/
+├── .htaccess
+├── .gitignore
+└── login.php

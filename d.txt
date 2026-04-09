@@ -1,0 +1,40 @@
+# ContraChoice: A Modern Birth Control Information System to Improve Contraceptive  
+Knowledge and Decision-Making among Women at SEAIT
+
+
+## 4.0 Features and Functionalities
+
+### Contraceptive Comparison Guide
+Allows users to compare different birth control methods side by side in one place.  
+It shows details like effectiveness, side effects, cost, and how each method is used, making  
+it easier to choose without getting overwhelmed.
+
+### Personalized Questionnaire
+Users answer a few simple questions about themselves. The systemn then shows only  
+the information that is most relevant to their age, health, and lifestyle instead of showing  
+everything at once.
+
+### Anonymous Q&A Community Forum
+This feature is like a private online discussion board where women can post  
+questions about contraceptives without using their real name or identity. Other users or  
+moderators can reply with answers and experiences. This feature is important because many Women feel shy or embarrassed to ask about reproductive health in person. The anonymity  
+SIves them the freedom to ask anything without fear of being judged or identified.
+
+### AI Chatbot
+This is an automated virtual assistant built into the system that is available anytime,  
+day or night. Users can type their questions in a conversational way, just like chatting with  
+messaging app, and the chatbot will respond with accurate and helpful  
+answers about contraceptives. It can answer common questions, explain terms, and guide  
+SOmeone On a  
+through the system. This is especially helpful for users who need quick answers  
+without waiting for a real person to respond.  
+users
+
+### Smart Contraceptive Recommendation Engine
+This feature automatically suggests the most suitable birth control methods based  
+on the user's answers and preferences. It works similarly to how online shopping platforms  
+recommend products but instead, it recommends contraceptives that best match the user's  
+needs.
+
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
