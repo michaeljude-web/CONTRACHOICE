@@ -191,7 +191,7 @@ $user_age    = 'Not specified';
       <div class="topbar-left">
         <span class="topbar-title">ContraChoice</span>
         <span class="topbar-sep">›</span>
-        <span class="topbar-page"><?= htmlspecialchars($page_title) ?></span>
+        <span class="topbar-page"><?= htmlspecialchars($page_title)?></span>
       </div>
     </div>
 

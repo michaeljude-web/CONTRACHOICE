@@ -170,9 +170,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </button>
     </form>
 
-    <div class="back-link">
-        <a href="../user/login.php"><i class="fas fa-arrow-left me-1"></i> Back to User Login</a>
-    </div>
 </div>
 </body>
 </html>

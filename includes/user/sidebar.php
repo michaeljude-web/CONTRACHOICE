@@ -10,7 +10,8 @@ if (isset($_SESSION['user_id'])) {
         $user_name = $row['username'];
     }
 }
-$initials = strtoupper(substr($user_name, 0, 2));
+$initials    = strtoupper(substr($user_name, 0, 2));
+$user_avatar = $_SESSION['avatar'] ?? null; // emoji avatar from settings
 
 $user_nav = [
   ['section' => 'Main'],
@@ -131,7 +132,21 @@ $icons = [
   .user-chip { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; transition: background 0.12s; }
   .user-chip:hover { background: var(--surface2); }
 
-  .avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+  /* avatar — emoji version */
+  .avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .avatar-emoji {
+    font-size: 18px; line-height: 1;
+    background: var(--blue-50);
+    border: 1px solid rgba(24,95,165,.15);
+  }
+  /* initials fallback */
+  .avatar-initials {
+    font-size: 11px; font-weight: 500;
+  }
   .avatar-user  { background: var(--blue-50);   color: var(--blue-800); }
   .avatar-admin { background: var(--purple-50); color: var(--purple-800); }
 
@@ -201,9 +216,19 @@ $icons = [
 
   <div class="sidebar-footer">
     <div class="user-chip">
-      <div class="avatar avatar-<?= $is_admin ? 'admin' : 'user' ?>">
-        <?= htmlspecialchars($initials) ?>
-      </div>
+
+      <?php if ($user_avatar): ?>
+        <!-- Emoji avatar from settings -->
+        <div class="avatar avatar-emoji">
+          <?= htmlspecialchars($user_avatar) ?>
+        </div>
+      <?php else: ?>
+        <!-- Initials fallback -->
+        <div class="avatar avatar-initials avatar-<?= $is_admin ? 'admin' : 'user' ?>">
+          <?= htmlspecialchars($initials) ?>
+        </div>
+      <?php endif; ?>
+
       <div class="user-info">
         <div class="user-name"><?= htmlspecialchars($user_name) ?></div>
         <div class="user-role">@<?= htmlspecialchars($user_name) ?></div>
