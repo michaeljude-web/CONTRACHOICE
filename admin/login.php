@@ -410,23 +410,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <div class="left-footer">
-        <div class="study-label">Research Study</div>
+        <!-- <div class="study-label">Research Study</div>
         <div class="study-title">
             A Modern Birth Control Information System and Its Effect on Contraceptive Knowledge,
             Decision-Making, and User Satisfaction among Women
-        </div>
+        </div> -->
         <div class="study-institution">
             <div class="inst-bar"></div>
-            <div class="inst-name">SEAIT</div>
+            <!-- <div class="inst-name">SEAIT</div> -->
         </div>
     </div>
 </div>
 
-<!-- Right login panel -->
 <div class="panel-right">
     <div class="login-box">
 
-        <div class="login-eyebrow">Secure Access</div>
+        <!-- <div class="login-eyebrow">Secure Access</div> -->
         <div class="login-heading">Welcome back,<br>Administrator</div>
         <div class="login-sub">Sign in to manage contraceptive methods and system content.</div>
 

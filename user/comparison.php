@@ -7,92 +7,11 @@ $page_title  = 'Comparison Guide';
 $active_page = 'comparison';
 $is_admin    = false;
 
-$methods = [
-  [
-    'name'          => 'Hormonal IUD',
-    'type'          => 'Long-acting',
-    'type_color'    => 'blue',
-    'effectiveness' => 99.8,
-    'duration'      => '3–8 years',
-    'cost_estimate' => '₱8,000–₱12,000 (one-time, lasts years)',
-    'cost'          => '₱₱₱',
-    'hormonal'      => true,
-    'prescription'  => true,
-    'how_used'      => 'Inserted by a doctor into the uterus. Works by releasing small amounts of progestin to prevent pregnancy.',
-    'side_effects'  => 'Irregular periods, lighter periods over time, possible spotting in the first months.',
-    'best_for'      => 'Women who want long-term protection with minimal daily effort.',
-  ],
-  [
-    'name'          => 'Copper IUD',
-    'type'          => 'Long-acting',
-    'type_color'    => 'blue',
-    'effectiveness' => 99.4,
-    'duration'      => 'Up to 10 years',
-    'cost_estimate' => '₱5,000–₱10,000 (one-time, lasts years)',
-    'cost'          => '₱₱₱',
-    'hormonal'      => false,
-    'prescription'  => true,
-    'how_used'      => 'Inserted by a doctor. Copper ions prevent sperm from fertilizing an egg. Hormone-free.',
-    'side_effects'  => 'Heavier or more painful periods, especially in the first few months.',
-    'best_for'      => 'Women who prefer a hormone-free option with long-term effectiveness.',
-  ],
-  [
-    'name'          => 'Implant',
-    'type'          => 'Long-acting',
-    'type_color'    => 'blue',
-    'effectiveness' => 99.9,
-    'duration'      => 'Up to 3 years',
-    'cost_estimate' => '₱6,000–₱9,000 (one-time insertion)',
-    'cost'          => '₱₱₱',
-    'hormonal'      => true,
-    'prescription'  => true,
-    'how_used'      => 'A small rod inserted under the skin of the upper arm by a doctor. Releases progestin continuously.',
-    'side_effects'  => 'Irregular spotting, possible absence of periods, headaches in some users.',
-    'best_for'      => 'Women who want the highest effectiveness without thinking about daily or monthly use.',
-  ],
-  [
-    'name'          => 'Combined Pill',
-    'type'          => 'Short-acting',
-    'type_color'    => 'green',
-    'effectiveness' => 93,
-    'duration'      => 'Daily',
-    'cost_estimate' => '₱300–₱600 per month',
-    'cost'          => '₱',
-    'hormonal'      => true,
-    'prescription'  => true,
-    'how_used'      => 'One pill taken at the same time every day. Contains estrogen and progestin. Must not be missed.',
-    'side_effects'  => 'Nausea, breast tenderness, mood changes. Not suitable for smokers over 35.',
-    'best_for'      => 'Women who want a reversible option and can commit to a daily routine.',
-  ],
-  [
-    'name'          => 'Condom',
-    'type'          => 'Barrier',
-    'type_color'    => 'amber',
-    'effectiveness' => 87,
-    'duration'      => 'Per use',
-    'cost_estimate' => '₱20–₱50 each (₱200–₱300 per box of 10)',
-    'cost'          => '₱',
-    'hormonal'      => false,
-    'prescription'  => false,
-    'how_used'      => 'Worn on the penis during sex. Creates a physical barrier. Only method that also protects against STIs.',
-    'side_effects'  => 'Possible latex allergy. Effectiveness depends on correct and consistent use.',
-    'best_for'      => 'Anyone who also needs STI protection. Good combined with other methods.',
-  ],
-  [
-    'name'          => 'Depo-Provera (Injection)',
-    'type'          => 'Short-acting',
-    'type_color'    => 'green',
-    'effectiveness' => 96,
-    'duration'      => 'Every 3 months',
-    'cost_estimate' => '₱500–₱800 per injection',
-    'cost'          => '₱₱',
-    'hormonal'      => true,
-    'prescription'  => true,
-    'how_used'      => 'An injection of progestin given by a healthcare provider every 3 months.',
-    'side_effects'  => 'Irregular bleeding or no periods, possible delay in return of fertility after stopping.',
-    'best_for'      => 'Women who prefer not to take a daily pill but want hormonal protection.',
-  ],
-];
+$result = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id");
+$methods = [];
+while ($row = $result->fetch_assoc()) {
+    $methods[] = $row;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -138,18 +57,8 @@ $methods = [
       color: var(--text-primary);
       font-size: 14px;
     }
-    .cc-layout {
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
-    }
-    .cc-main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      background: var(--bg);
-    }
+    .cc-layout { display: flex; height: 100vh; overflow: hidden; }
+    .cc-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
     .topbar {
       height: 52px;
       background: var(--surface);
@@ -161,401 +70,124 @@ $methods = [
       flex-shrink: 0;
     }
     .topbar-left { display: flex; align-items: center; gap: 8px; }
-    .topbar-title {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--text-primary);
-    }
-    .topbar-title em { font-style: italic; color: var(--blue-600); }
+    .topbar-title { font-family: 'Playfair Display', Georgia, serif; font-size: 14px; font-weight: 400; color: var(--text-primary); }
     .topbar-sep  { color: var(--text-muted); font-size: 13px; }
     .topbar-page { font-size: 13px; color: var(--text-sec); }
-    .topbar-right { display: flex; align-items: center; gap: 10px; }
-    .topbar-user {
-      font-size: 12px;
-      color: var(--text-muted);
-      background: var(--surface2);
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-    .content-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 28px 28px;
-    }
-    .page-header {
-      margin-bottom: 24px;
-    }
-    .page-heading {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 24px;
-      font-weight: 400;
-      color: var(--text-primary);
-      margin-bottom: 5px;
-      letter-spacing: -0.3px;
-    }
-    .page-heading em { font-style: italic; color: var(--blue-600); }
-    .page-sub {
-      font-size: 13px;
-      color: var(--text-sec);
-      line-height: 1.5;
-      max-width: 560px;
-    }
-    .filter-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 20px;
-      align-items: center;
-    }
-    .filter-label {
-      font-size: 11px;
-      font-weight: 500;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      margin-right: 2px;
-    }
-    .filter-btn {
-      font-size: 12px;
-      padding: 5px 14px;
-      border-radius: 20px;
-      border: 0.5px solid var(--border-md);
-      background: var(--surface);
-      color: var(--text-sec);
-      cursor: pointer;
-      font-family: 'Outfit', sans-serif;
-      transition: background 0.12s, color 0.12s, border-color 0.12s;
-    }
+    .content-area { flex: 1; overflow-y: auto; padding: 28px; }
+    .page-header { margin-bottom: 24px; }
+    .page-heading { font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 400; color: var(--text-primary); margin-bottom: 5px; letter-spacing: -0.3px; }
+    .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; align-items: center; }
+    .filter-label { font-size: 11px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin-right: 2px; }
+    .filter-btn { font-size: 12px; padding: 5px 14px; border-radius: 20px; border: 0.5px solid var(--border-md); background: var(--surface); color: var(--text-sec); cursor: pointer; font-family: 'Outfit', sans-serif; transition: background 0.12s, color 0.12s; }
     .filter-btn:hover { background: var(--surface2); }
-    .filter-btn.active {
-      background: var(--blue-50);
-      border-color: var(--blue-600);
-      color: var(--blue-800);
-      font-weight: 500;
-    }
+    .filter-btn.active { background: var(--blue-50); border-color: var(--blue-600); color: var(--blue-800); font-weight: 500; }
     .compare-bar {
-      display: none;
-      align-items: center;
-      gap: 12px;
-      background: var(--blue-800);
-      color: #fff;
-      padding: 10px 18px;
-      border-radius: 10px;
-      margin-bottom: 18px;
-      font-size: 13px;
+      display: none; align-items: center; gap: 12px;
+      background: var(--blue-800); color: #fff;
+      padding: 10px 18px; border-radius: 10px; margin-bottom: 18px; font-size: 13px;
     }
     .compare-bar.visible { display: flex; }
     .compare-bar-label { flex: 1; font-weight: 500; }
     .compare-bar-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-    .compare-chip {
-      background: rgba(255,255,255,0.15);
-      border-radius: 20px;
-      padding: 3px 10px;
-      font-size: 12px;
-    }
-    .compare-bar-btn {
-      padding: 6px 16px;
-      border-radius: 7px;
-      border: none;
-      background: #fff;
-      color: var(--blue-800);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'Outfit', sans-serif;
-      transition: opacity 0.12s;
-    }
-    .compare-bar-btn:hover { opacity: 0.85; }
-    .compare-bar-clear {
-      background: none;
-      border: none;
-      color: rgba(255,255,255,0.6);
-      cursor: pointer;
-      font-size: 13px;
-      padding: 4px;
-      line-height: 1;
-    }
+    .compare-chip { background: rgba(255,255,255,0.15); border-radius: 20px; padding: 3px 10px; font-size: 12px; }
+    .compare-bar-btn { padding: 6px 16px; border-radius: 7px; border: none; background: #fff; color: var(--blue-800); font-size: 12px; font-weight: 600; cursor: pointer; font-family: 'Outfit', sans-serif; }
+    .compare-bar-clear { background: none; border: none; color: rgba(255,255,255,0.6); cursor: pointer; font-size: 13px; padding: 4px; }
     .compare-bar-clear:hover { color: #fff; }
-    .methods-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 14px;
-    }
+    .methods-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
     .method-card {
       background: var(--surface);
       border: 0.5px solid var(--border-md);
       border-radius: 12px;
       padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
+      display: flex; flex-direction: column; gap: 14px;
       transition: border-color 0.15s, box-shadow 0.15s;
-      cursor: default;
       position: relative;
       animation: cardIn 0.25s ease both;
     }
-    .method-card:hover {
-      border-color: var(--blue-100);
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-    }
-    .method-card.selected {
-      border-color: var(--blue-600);
-      box-shadow: 0 0 0 2px var(--blue-50);
-    }
+    .method-card:hover { border-color: var(--blue-100); box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .method-card.selected { border-color: var(--blue-600); box-shadow: 0 0 0 2px var(--blue-50); }
     .method-card.hidden { display: none; }
-    @keyframes cardIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to   { opacity: 1; transform: none; }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    .method-img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 0.5px solid var(--border);
     }
-    .card-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
-    }
-    .card-name {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--text-primary);
-      line-height: 1.2;
-    }
-    .card-select-btn {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 1.5px solid var(--border-md);
-      background: none;
-      cursor: pointer;
-      flex-shrink: 0;
+    .method-img-placeholder {
+      width: 100%;
+      height: 200px;
+      border-radius: 8px;
+      background: var(--surface2);
+      border: 0.5px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: border-color 0.12s, background 0.12s;
-      margin-top: 1px;
-      padding: 0;
+      color: var(--text-muted);
+      font-size: 32px;
+    }
+
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .card-name { font-size: 15px; font-weight: 500; color: var(--text-primary); line-height: 1.2; }
+    .card-select-btn {
+      width: 20px; height: 20px; border-radius: 50%;
+      border: 1.5px solid var(--border-md); background: none; cursor: pointer;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.12s, background 0.12s; margin-top: 1px; padding: 0;
     }
     .card-select-btn:hover { border-color: var(--blue-600); }
-    .method-card.selected .card-select-btn {
-      background: var(--blue-600);
-      border-color: var(--blue-600);
-    }
+    .method-card.selected .card-select-btn { background: var(--blue-600); border-color: var(--blue-600); }
     .card-select-btn svg { display: none; }
     .method-card.selected .card-select-btn svg { display: block; }
-    .card-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 5px;
-      margin-top: 4px;
-    }
-    .tag {
-      font-size: 10px;
-      font-weight: 500;
-      padding: 2px 8px;
-      border-radius: 20px;
-    }
-    .tag-blue   { background: var(--blue-50);   color: var(--blue-800);   }
-    .tag-green  { background: var(--green-50);  color: var(--green-800);  }
-    .tag-amber  { background: var(--amber-50);  color: var(--amber-800);  }
-    .tag-teal   { background: var(--teal-50);   color: var(--teal-700);   }
+    .card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+    .tag { font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
+    .tag-blue   { background: var(--blue-50);   color: var(--blue-800); }
+    .tag-green  { background: var(--green-50);  color: var(--green-800); }
+    .tag-amber  { background: var(--amber-50);  color: var(--amber-800); }
+    .tag-teal   { background: var(--teal-50);   color: var(--teal-700); }
     .tag-purple { background: var(--purple-50); color: var(--purple-800); }
-    .eff-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .eff-row { display: flex; align-items: center; gap: 10px; }
     .eff-label { font-size: 11px; color: var(--text-muted); width: 78px; flex-shrink: 0; }
-    .eff-track {
-      flex: 1;
-      height: 5px;
-      background: var(--surface2);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-    .eff-fill {
-      height: 100%;
-      border-radius: 3px;
-      background: var(--blue-600);
-      transition: width 0.4s ease;
-    }
-    .eff-pct {
-      font-size: 12px;
-      font-weight: 500;
-      color: var(--text-primary);
-      width: 36px;
-      text-align: right;
-      flex-shrink: 0;
-    }
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-    .info-item-label {
-      font-size: 10px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--text-muted);
-      margin-bottom: 2px;
-    }
-    .info-item-val {
-      font-size: 12px;
-      color: var(--text-primary);
-    }
-    .card-detail {
-      border-top: 0.5px solid var(--border);
-      padding-top: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .detail-block-label {
-      font-size: 10px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--text-muted);
-      margin-bottom: 3px;
-    }
-    .detail-block-val {
-      font-size: 12px;
-      color: var(--text-sec);
-      line-height: 1.55;
-    }
-    .card-toggle {
-      font-size: 12px;
-      color: var(--blue-600);
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-      font-family: 'Outfit', sans-serif;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      align-self: flex-start;
-      transition: opacity 0.12s;
-    }
-    .card-toggle:hover { opacity: 0.75; }
+    .eff-track { flex: 1; height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
+    .eff-fill { height: 100%; border-radius: 3px; background: var(--blue-600); }
+    .eff-pct { font-size: 12px; font-weight: 500; color: var(--text-primary); width: 36px; text-align: right; flex-shrink: 0; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .info-item-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 2px; }
+    .info-item-val { font-size: 12px; color: var(--text-primary); }
+    .card-detail { border-top: 0.5px solid var(--border); padding-top: 12px; display: none; flex-direction: column; gap: 8px; }
+    .method-card.expanded .card-detail { display: flex; }
+    .detail-block-label { font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); margin-bottom: 3px; }
+    .detail-block-val { font-size: 12px; color: var(--text-sec); line-height: 1.55; }
+    .card-toggle { font-size: 12px; color: var(--blue-600); background: none; border: none; cursor: pointer; padding: 0; font-family: 'Outfit', sans-serif; display: flex; align-items: center; gap: 4px; align-self: flex-start; }
     .card-toggle svg { transition: transform 0.2s; }
     .card-toggle.expanded svg { transform: rotate(180deg); }
-    .card-detail { display: none; }
-    .method-card.expanded .card-detail { display: flex; }
+
     .compare-modal-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.3);
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      z-index: 999;
-      padding: 28px 20px;
-      overflow-y: auto;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.18s;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.3);
+      display: flex; align-items: flex-start; justify-content: center;
+      z-index: 999; padding: 28px 20px; overflow-y: auto;
+      opacity: 0; pointer-events: none; transition: opacity 0.18s;
     }
-    .compare-modal-overlay.open {
-      opacity: 1;
-      pointer-events: all;
-    }
-    .compare-modal {
-      background: var(--surface);
-      border-radius: 14px;
-      width: 100%;
-      max-width: 860px;
-      overflow: hidden;
-      box-shadow: 0 12px 48px rgba(0,0,0,0.14);
-      transform: translateY(8px);
-      transition: transform 0.18s;
-    }
+    .compare-modal-overlay.open { opacity: 1; pointer-events: all; }
+    .compare-modal { background: var(--surface); border-radius: 14px; width: 100%; max-width: 900px; overflow: hidden; box-shadow: 0 12px 48px rgba(0,0,0,0.14); transform: translateY(8px); transition: transform 0.18s; }
     .compare-modal-overlay.open .compare-modal { transform: translateY(0); }
-    .modal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 18px 22px;
-      border-bottom: 0.5px solid var(--border);
-    }
-    .modal-title {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 17px;
-      font-weight: 400;
-    }
-    .modal-close {
-      width: 28px; height: 28px;
-      border-radius: 8px;
-      border: 0.5px solid var(--border-md);
-      background: none;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--text-sec);
-      font-size: 16px;
-      transition: background 0.12s;
-    }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 0.5px solid var(--border); }
+    .modal-title { font-family: 'Playfair Display', Georgia, serif; font-size: 17px; font-weight: 400; }
+    .modal-close { width: 28px; height: 28px; border-radius: 8px; border: 0.5px solid var(--border-md); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text-sec); font-size: 16px; }
     .modal-close:hover { background: var(--surface2); }
     .compare-table-wrap { overflow-x: auto; }
-    .compare-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .compare-table th {
-      padding: 14px 18px;
-      text-align: left;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-primary);
-      background: var(--bg);
-      border-bottom: 0.5px solid var(--border-md);
-      white-space: nowrap;
-    }
-    .compare-table th:first-child {
-      font-size: 11px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      color: var(--text-muted);
-      width: 130px;
-    }
-    .compare-table td {
-      padding: 12px 18px;
-      font-size: 13px;
-      color: var(--text-sec);
-      border-bottom: 0.5px solid var(--border);
-      vertical-align: top;
-      line-height: 1.5;
-    }
-    .compare-table td:first-child {
-      font-size: 11px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-      white-space: nowrap;
-    }
+    .compare-table { width: 100%; border-collapse: collapse; }
+    .compare-table th { padding: 14px 18px; text-align: left; font-size: 13px; font-weight: 500; color: var(--text-primary); background: var(--bg); border-bottom: 0.5px solid var(--border-md); white-space: nowrap; }
+    .compare-table th:first-child { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); width: 130px; }
+    .compare-table td { padding: 12px 18px; font-size: 13px; color: var(--text-sec); border-bottom: 0.5px solid var(--border); vertical-align: top; line-height: 1.5; }
+    .compare-table td:first-child { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); white-space: nowrap; }
     .compare-table tr:last-child td { border-bottom: none; }
-    .pill-yes { display: inline-block; background: var(--green-50);  color: var(--green-800);  font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
+    .compare-img { width: 100%; height: 180px; object-fit: cover; border-radius: 8px; border: 0.5px solid var(--border); }
+    .compare-img-placeholder { width: 100%; height: 180px; border-radius: 8px; background: var(--surface2); display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 24px; }
+    .pill-yes { display: inline-block; background: var(--green-50); color: var(--green-800); font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
     .pill-no  { display: inline-block; background: var(--surface2); color: var(--text-muted); font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 20px; }
-    .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 48px 24px;
-      text-align: center;
-      gap: 8px;
-    }
-    .empty-icon {
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      background: var(--surface2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 20px;
-      margin-bottom: 6px;
-    }
-    .empty-title { font-size: 15px; font-weight: 500; color: var(--text-primary); }
-    .empty-sub   { font-size: 13px; color: var(--text-muted); max-width: 260px; line-height: 1.55; }
   </style>
 </head>
 <body>
@@ -569,31 +201,47 @@ $methods = [
         <span class="topbar-page"><?= htmlspecialchars($page_title) ?></span>
       </div>
     </div>
-    <div class="content-area" id="cc-content">
+    <div class="content-area">
       <div class="page-header">
         <h1 class="page-heading">Contraceptive Comparison Guide</h1>
       </div>
       <div class="filter-bar">
         <span class="filter-label">Filter:</span>
         <button class="filter-btn active" onclick="filterMethods('all', this)">All methods</button>
-        <button class="filter-btn" onclick="filterMethods('long-acting', this)">Long-acting</button>
-        <button class="filter-btn" onclick="filterMethods('short-acting', this)">Short-acting</button>
+        <button class="filter-btn" onclick="filterMethods('long_term', this)">Long-acting</button>
+        <button class="filter-btn" onclick="filterMethods('hormonal', this)">Hormonal</button>
         <button class="filter-btn" onclick="filterMethods('barrier', this)">Barrier</button>
+        <button class="filter-btn" onclick="filterMethods('natural', this)">Natural</button>
+        <button class="filter-btn" onclick="filterMethods('emergency', this)">Emergency</button>
         <button class="filter-btn" onclick="filterMethods('non-hormonal', this)">Non-hormonal</button>
       </div>
       <div class="compare-bar" id="compare-bar">
         <span class="compare-bar-label">Comparing:</span>
         <div class="compare-bar-chips" id="compare-chips"></div>
         <button class="compare-bar-btn" onclick="openCompareModal()">Compare side by side →</button>
-        <button class="compare-bar-clear" onclick="clearSelection()" title="Clear selection">✕</button>
+        <button class="compare-bar-clear" onclick="clearSelection()">✕</button>
       </div>
       <div class="methods-grid" id="methods-grid">
         <?php foreach ($methods as $i => $m):
-          $type_lower = strtolower(str_replace('-', '', $m['type']));
-          $eff_width  = $m['effectiveness'];
-          $eff_color  = $m['effectiveness'] >= 99 ? '#0F6E56' : ($m['effectiveness'] >= 95 ? '#185FA5' : '#854F0B');
+          $eff = floatval($m['effectiveness']);
+          $eff_color = $eff >= 99 ? '#0F6E56' : ($eff >= 95 ? '#185FA5' : '#854F0B');
+          $category = strtolower($m['category']);
+          $type_labels = ['hormonal' => 'Hormonal', 'barrier' => 'Barrier', 'long_term' => 'Long-acting', 'natural' => 'Natural', 'emergency' => 'Emergency'];
+          $type_colors = ['hormonal' => 'green', 'barrier' => 'amber', 'long_term' => 'blue', 'natural' => 'teal', 'emergency' => 'purple'];
+          $type_label = $type_labels[$category] ?? ucfirst($category);
+          $type_color = $type_colors[$category] ?? 'blue';
         ?>
-        <div class="method-card" id="card-<?= $i ?>" data-index="<?= $i ?>" data-type="<?= htmlspecialchars(strtolower($m['type'])) ?>" data-hormonal="<?= $m['hormonal'] ? 'true' : 'false' ?>">
+        <div class="method-card" id="card-<?= $i ?>"
+             data-index="<?= $i ?>"
+             data-category="<?= htmlspecialchars($category) ?>"
+             data-hormonal="<?= $m['is_hormone_free'] ? 'false' : 'true' ?>">
+
+          <?php if (!empty($m['image_path'])): ?>
+            <img src="../uploads/contraceptive_methods/<?= htmlspecialchars($m['image_path']) ?>" class="method-img" alt="<?= htmlspecialchars($m['name']) ?>">
+          <?php else: ?>
+            <div class="method-img-placeholder">💊</div>
+          <?php endif; ?>
+
           <div>
             <div class="card-top">
               <div class="card-name"><?= htmlspecialchars($m['name']) ?></div>
@@ -604,59 +252,75 @@ $methods = [
               </button>
             </div>
             <div class="card-tags">
-              <span class="tag tag-<?= htmlspecialchars($m['type_color']) ?>"><?= htmlspecialchars($m['type']) ?></span>
-              <?php if (!$m['hormonal']): ?>
+              <span class="tag tag-<?= $type_color ?>"><?= $type_label ?></span>
+              <?php if ($m['is_hormone_free']): ?>
                 <span class="tag tag-teal">Non-hormonal</span>
               <?php endif; ?>
-              <?php if (!$m['prescription']): ?>
-                <span class="tag tag-amber">No prescription</span>
+              <?php if (strtolower($m['cost_level']) === 'low'): ?>
+                <span class="tag tag-amber">Low cost</span>
               <?php endif; ?>
             </div>
           </div>
+
           <div class="eff-row">
             <span class="eff-label">Effectiveness</span>
             <div class="eff-track">
-              <div class="eff-fill" style="width:<?= $eff_width ?>%;background:<?= $eff_color ?>;"></div>
+              <div class="eff-fill" style="width:<?= $eff ?>%;background:<?= $eff_color ?>;"></div>
             </div>
-            <span class="eff-pct"><?= $eff_width ?>%</span>
+            <span class="eff-pct"><?= $eff ?>%</span>
           </div>
+
           <div class="info-grid">
             <div class="info-item">
-              <div class="info-item-label">Duration</div>
-              <div class="info-item-val"><?= htmlspecialchars($m['duration']) ?></div>
+              <div class="info-item-label">Delivery</div>
+              <div class="info-item-val"><?= htmlspecialchars($m['delivery']) ?></div>
             </div>
             <div class="info-item">
-              <div class="info-item-label">Est. Cost</div>
-              <div class="info-item-val"><?= htmlspecialchars($m['cost_estimate']) ?></div>
+              <div class="info-item-label">Cost</div>
+              <div class="info-item-val"><?= str_repeat('₱', $m['cost_level'] === 'low' ? 1 : ($m['cost_level'] === 'medium' ? 2 : 3)) ?></div>
             </div>
             <div class="info-item">
               <div class="info-item-label">Hormonal</div>
-              <div class="info-item-val"><?= $m['hormonal'] ? 'Yes' : 'No' ?></div>
+              <div class="info-item-val"><?= $m['is_hormone_free'] ? 'No' : 'Yes' ?></div>
             </div>
             <div class="info-item">
-              <div class="info-item-label">Prescription</div>
-              <div class="info-item-val"><?= $m['prescription'] ? 'Required' : 'Not needed' ?></div>
+              <div class="info-item-label">Smoker-safe</div>
+              <div class="info-item-val"><?= $m['suitable_smoker'] ? 'Yes' : 'No' ?></div>
             </div>
           </div>
+
           <button class="card-toggle" id="toggle-<?= $i ?>" onclick="toggleExpand(<?= $i ?>)">
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
               <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             See details
           </button>
+
           <div class="card-detail">
+            <?php if (!empty($m['how_used'])): ?>
             <div class="detail-block">
               <div class="detail-block-label">How it's used</div>
               <div class="detail-block-val"><?= htmlspecialchars($m['how_used']) ?></div>
             </div>
+            <?php endif; ?>
+            <?php if (!empty($m['side_effects'])): ?>
             <div class="detail-block">
               <div class="detail-block-label">Common side effects</div>
               <div class="detail-block-val"><?= htmlspecialchars($m['side_effects']) ?></div>
             </div>
+            <?php endif; ?>
+            <?php if (!empty($m['best_for'])): ?>
             <div class="detail-block">
               <div class="detail-block-label">Best for</div>
               <div class="detail-block-val"><?= htmlspecialchars($m['best_for']) ?></div>
             </div>
+            <?php endif; ?>
+            <?php if (!empty($m['contraindications'])): ?>
+            <div class="detail-block">
+              <div class="detail-block-label">Contraindications</div>
+              <div class="detail-block-val"><?= htmlspecialchars($m['contraindications']) ?></div>
+            </div>
+            <?php endif; ?>
           </div>
         </div>
         <?php endforeach; ?>
@@ -664,6 +328,7 @@ $methods = [
     </div>
   </div>
 </div>
+
 <div class="compare-modal-overlay" id="compare-modal-overlay">
   <div class="compare-modal">
     <div class="modal-header">
@@ -675,6 +340,7 @@ $methods = [
     </div>
   </div>
 </div>
+
 <script>
 const METHODS = <?= json_encode($methods, JSON_UNESCAPED_UNICODE) ?>;
 let selected = [];
@@ -717,14 +383,12 @@ function filterMethods(filter, btn) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   document.querySelectorAll('.method-card').forEach(card => {
-    const type     = card.dataset.type;
+    const cat      = card.dataset.category;
     const hormonal = card.dataset.hormonal;
     let show = false;
-    if (filter === 'all')          show = true;
-    else if (filter === 'long-acting')   show = type === 'long-acting';
-    else if (filter === 'short-acting')  show = type === 'short-acting';
-    else if (filter === 'barrier')       show = type === 'barrier';
-    else if (filter === 'non-hormonal')  show = hormonal === 'false';
+    if (filter === 'all')           show = true;
+    else if (filter === 'non-hormonal') show = hormonal === 'false';
+    else                            show = cat === filter;
     card.classList.toggle('hidden', !show);
   });
 }
@@ -741,20 +405,30 @@ function toggleExpand(i) {
 
 function openCompareModal() {
   const cols = selected.map(i => METHODS[i]);
+  const costSymbol = m => {
+    const map = {low: '₱', medium: '₱₱', high: '₱₱₱'};
+    return map[m.cost_level] || m.cost_level;
+  };
+  const effColor = e => e >= 99 ? '#0F6E56' : e >= 95 ? '#185FA5' : '#854F0B';
+
   const rows = [
-    { label: 'Type',         fn: m => m.type },
-    { label: 'Effectiveness',fn: m => `<div class="eff-row" style="gap:8px;">
-        <div class="eff-track"><div class="eff-fill" style="width:${m.effectiveness}%;background:${m.effectiveness>=99?'#0F6E56':m.effectiveness>=95?'#185FA5':'#854F0B'};"></div></div>
-        <span style="font-size:12px;font-weight:500;color:var(--text-primary);flex-shrink:0;">${m.effectiveness}%</span>
-      </div>` },
-    { label: 'Duration',     fn: m => m.duration },
-    { label: 'Est. Cost',    fn: m => m.cost_estimate },
-    { label: 'Hormonal',     fn: m => m.hormonal ? '<span class="pill-yes">Yes</span>' : '<span class="pill-no">No</span>' },
-    { label: 'Prescription', fn: m => m.prescription ? '<span class="pill-yes">Required</span>' : '<span class="pill-no">Not needed</span>' },
-    { label: 'How it works', fn: m => m.how_used },
-    { label: 'Side effects', fn: m => m.side_effects },
-    { label: 'Best for',     fn: m => m.best_for },
+    { label: 'Photo',         fn: m => m.image_path
+        ? `<img src="../uploads/contraceptive_methods/${m.image_path}" class="compare-img" alt="${m.name}">`
+        : `<div class="compare-img-placeholder">💊</div>` },
+    { label: 'Category',      fn: m => m.category },
+    { label: 'Effectiveness', fn: m => `<div class="eff-row" style="gap:8px;">
+        <div class="eff-track"><div class="eff-fill" style="width:${m.effectiveness}%;background:${effColor(m.effectiveness)};"></div></div>
+        <span style="font-size:12px;font-weight:500;flex-shrink:0;">${m.effectiveness}%</span></div>` },
+    { label: 'Delivery',      fn: m => m.delivery },
+    { label: 'Cost',          fn: m => costSymbol(m) },
+    { label: 'Hormonal',      fn: m => m.is_hormone_free ? '<span class="pill-no">No</span>' : '<span class="pill-yes">Yes</span>' },
+    { label: 'Smoker-safe',   fn: m => m.suitable_smoker == 1 ? '<span class="pill-yes">Yes</span>' : '<span class="pill-no">No</span>' },
+    { label: 'Breastfeeding', fn: m => m.suitable_breastfeeding == 1 ? '<span class="pill-yes">Yes</span>' : '<span class="pill-no">No</span>' },
+    { label: 'How it works',  fn: m => m.how_used || '—' },
+    { label: 'Side effects',  fn: m => m.side_effects || '—' },
+    { label: 'Best for',      fn: m => m.best_for || '—' },
   ];
+
   let html = '<thead><tr><th></th>';
   cols.forEach(m => { html += `<th>${m.name}</th>`; });
   html += '</tr></thead><tbody>';
