@@ -531,12 +531,14 @@ if ($q) {
       height: 100vh;
     }
     .recommendation-modal-left-panel img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
       display: block;
       position: absolute;
-      top: 0; left: 0;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
     }
     .recommendation-modal-left-placeholder {
       width: 100%;
@@ -937,7 +939,9 @@ if ($q) {
       <div class="recommendation-modal-left-placeholder" id="modalImgPlaceholder">
         <div class="recommendation-hero-icon"><i class="fa-solid fa-circle-dot" id="modalIconEl"></i></div>
       </div>
-      <img id="modalImg" src="" alt="" style="display:none; width:100%; height:100%; object-fit:cover; position:absolute; inset:0;">
+      <img id="modalImg" src="" alt=""
+           style="display:none; max-width:100%; max-height:100%; object-fit:contain;
+                  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);">
       <div class="recommendation-modal-left-overlay" id="modalLeftOverlay"></div>
       <div class="recommendation-modal-left-bottom">
         <div class="recommendation-modal-left-rank" id="modalRankBadge">Best Match</div>
