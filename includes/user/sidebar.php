@@ -459,7 +459,7 @@ $icons = [
 <aside class="sidebar" id="cc-sidebar">
 
   <div class="sidebar-logo">
-    <div class="logo-wordmark">Contra<em>Choice</em></div>
+    <div class="logo-wordmark">ContraChoice</div>
     <div class="logo-tagline"><?= $is_admin ? 'Admin Panel' : "Women's Health Companion" ?></div>
   </div>
 
