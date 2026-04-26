@@ -19,6 +19,7 @@ $has_existing = mysqli_num_rows($existing) > 0;
 if (isset($_POST['submit_questionnaire'])) {
 
     $allowed = [
+        'age_range'         => ['under_18','18_to_24','25_to_34','35_to_44','45_plus'],
         'sexually_active'   => ['yes','no','prefer_not_to_say'],
         'wants_children'    => ['yes','no','unsure'],
         'children_when'     => ['within_1yr','1_to_3yrs','3yrs_plus','not_applicable'],
@@ -28,36 +29,38 @@ if (isset($_POST['submit_questionnaire'])) {
         'delivery_pref'     => ['daily_pill','weekly_patch','monthly_injection','long_term','barrier','natural'],
         'budget_pref'       => ['low','medium','high'],
         'used_before'       => ['yes','no'],
+        'cycle_regularity'  => ['regular','irregular','not_sure'],
+        'relationship_status' => ['single','committed','prefer_not_to_say'],
     ];
 
-    $sexually_active   = trim($_POST['sexually_active']   ?? '');
-    $wants_children    = trim($_POST['wants_children']    ?? '');
-    $children_when     = trim($_POST['children_when']     ?? 'not_applicable');
-    $is_smoker         = trim($_POST['is_smoker']         ?? '');
-    $is_breastfeeding  = trim($_POST['is_breastfeeding']  ?? '');
-    $hormone_free_pref = trim($_POST['hormone_free_pref'] ?? '');
-    $delivery_pref     = trim($_POST['delivery_pref']     ?? '');
-    $budget_pref       = trim($_POST['budget_pref']       ?? '');
-    $used_before       = trim($_POST['used_before']       ?? '');
-    $previous_method   = substr(trim($_POST['previous_method'] ?? ''), 0, 100);
+    $age_range           = trim($_POST['age_range']           ?? '');
+    $sexually_active     = trim($_POST['sexually_active']     ?? '');
+    $wants_children      = trim($_POST['wants_children']      ?? '');
+    $children_when       = trim($_POST['children_when']       ?? 'not_applicable');
+    $is_smoker           = trim($_POST['is_smoker']           ?? '');
+    $is_breastfeeding    = trim($_POST['is_breastfeeding']    ?? '');
+    $hormone_free_pref   = trim($_POST['hormone_free_pref']   ?? '');
+    $delivery_pref       = trim($_POST['delivery_pref']       ?? '');
+    $budget_pref         = trim($_POST['budget_pref']         ?? '');
+    $used_before         = trim($_POST['used_before']         ?? '');
+    $cycle_regularity    = trim($_POST['cycle_regularity']    ?? '');
+    $relationship_status = trim($_POST['relationship_status'] ?? '');
+    $previous_method     = substr(trim($_POST['previous_method'] ?? ''), 0, 100);
 
-    if ($wants_children !== 'yes') {
-        $children_when = 'not_applicable';
-    }
-    if (empty($children_when)) {
-        $children_when = 'not_applicable';
-    }
+    if ($wants_children !== 'yes') $children_when = 'not_applicable';
+    if (empty($children_when))     $children_when = 'not_applicable';
 
-    $valid_conditions  = ['none','hypertension','migraines','diabetes','blood_clots','liver_disease','depression'];
-    $raw_conditions    = isset($_POST['health_conditions']) && is_array($_POST['health_conditions'])
-                         ? $_POST['health_conditions'] : ['none'];
-    $clean_conditions  = array_filter($raw_conditions, fn($v) => in_array($v, $valid_conditions));
+    $valid_conditions = ['none','hypertension','migraines','diabetes','blood_clots','liver_disease','depression'];
+    $raw_conditions   = isset($_POST['health_conditions']) && is_array($_POST['health_conditions'])
+                        ? $_POST['health_conditions'] : ['none'];
+    $clean_conditions = array_filter($raw_conditions, fn($v) => in_array($v, $valid_conditions));
     $health_conditions = !empty($clean_conditions) ? implode(',', $clean_conditions) : 'none';
 
     $fields_to_check = compact(
-        'sexually_active','wants_children','children_when',
+        'age_range','sexually_active','wants_children','children_when',
         'is_smoker','is_breastfeeding','hormone_free_pref',
-        'delivery_pref','budget_pref','used_before'
+        'delivery_pref','budget_pref','used_before',
+        'cycle_regularity','relationship_status'
     );
 
     $missing = [];
@@ -70,26 +73,29 @@ if (isset($_POST['submit_questionnaire'])) {
     if (!empty($missing)) {
         $error = "Please answer all questions before submitting. Missing: " . implode(', ', $missing);
     } else {
-        $sexually_active   = mysqli_real_escape_string($conn, $sexually_active);
-        $wants_children    = mysqli_real_escape_string($conn, $wants_children);
-        $children_when     = mysqli_real_escape_string($conn, $children_when);
-        $health_conditions = mysqli_real_escape_string($conn, $health_conditions);
-        $is_smoker         = mysqli_real_escape_string($conn, $is_smoker);
-        $is_breastfeeding  = mysqli_real_escape_string($conn, $is_breastfeeding);
-        $hormone_free_pref = mysqli_real_escape_string($conn, $hormone_free_pref);
-        $delivery_pref     = mysqli_real_escape_string($conn, $delivery_pref);
-        $budget_pref       = mysqli_real_escape_string($conn, $budget_pref);
-        $used_before       = mysqli_real_escape_string($conn, $used_before);
-        $previous_method   = mysqli_real_escape_string($conn, $previous_method);
+        $age_range           = mysqli_real_escape_string($conn, $age_range);
+        $sexually_active     = mysqli_real_escape_string($conn, $sexually_active);
+        $wants_children      = mysqli_real_escape_string($conn, $wants_children);
+        $children_when       = mysqli_real_escape_string($conn, $children_when);
+        $health_conditions   = mysqli_real_escape_string($conn, $health_conditions);
+        $is_smoker           = mysqli_real_escape_string($conn, $is_smoker);
+        $is_breastfeeding    = mysqli_real_escape_string($conn, $is_breastfeeding);
+        $hormone_free_pref   = mysqli_real_escape_string($conn, $hormone_free_pref);
+        $delivery_pref       = mysqli_real_escape_string($conn, $delivery_pref);
+        $budget_pref         = mysqli_real_escape_string($conn, $budget_pref);
+        $used_before         = mysqli_real_escape_string($conn, $used_before);
+        $cycle_regularity    = mysqli_real_escape_string($conn, $cycle_regularity);
+        $relationship_status = mysqli_real_escape_string($conn, $relationship_status);
+        $previous_method     = mysqli_real_escape_string($conn, $previous_method);
 
         $q = "INSERT INTO questionnaire_responses
-                (user_id, sexually_active, wants_children, children_when, health_conditions,
+                (user_id, age_range, sexually_active, wants_children, children_when, health_conditions,
                  is_smoker, is_breastfeeding, hormone_free_pref, delivery_pref, budget_pref,
-                 used_before, previous_method)
+                 used_before, previous_method, cycle_regularity, relationship_status)
               VALUES
-                ($user_id, '$sexually_active', '$wants_children', '$children_when', '$health_conditions',
+                ($user_id, '$age_range', '$sexually_active', '$wants_children', '$children_when', '$health_conditions',
                  '$is_smoker', '$is_breastfeeding', '$hormone_free_pref', '$delivery_pref', '$budget_pref',
-                 '$used_before', '$previous_method')";
+                 '$used_before', '$previous_method', '$cycle_regularity', '$relationship_status')";
 
         if (mysqli_query($conn, $q)) {
             $success      = "Your responses have been saved! Check your recommendations.";
@@ -102,8 +108,7 @@ if (isset($_POST['submit_questionnaire'])) {
 
 $user_result = mysqli_query($conn, "SELECT username FROM users WHERE user_id = $user_id LIMIT 1");
 $user_row    = mysqli_fetch_assoc($user_result);
-$user_name   = $user_row['username']  ?? $_SESSION['username'] ?? 'User';
-$user_age    = 'Not specified';
+$user_name   = $user_row['username'] ?? $_SESSION['username'] ?? 'User';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -112,73 +117,316 @@ $user_age    = 'Not specified';
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($page_title) ?> — ContraChoice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/vendor/bootstrap-5/css/bootstrap.min.css">
   <link rel="stylesheet" href="../assets/vendor/fontawesome-7/css/all.min.css">
-  <link rel="stylesheet" href="../assets/css/user/style.css">
   <style>
     :root {
-      --bg: #f7f6f3; --surface: #fff; --border: rgba(0,0,0,0.08);
-      --border-md: rgba(0,0,0,0.14); --text-primary: #1a1a18;
-      --text-secondary: #6b6b67; --text-muted: #a0a09b;
-      --blue-50: #e6f1fb; --blue-600: #185FA5; --blue-800: #0C447C;
-    }
-    html, body { height: 100%; font-family: 'Outfit', sans-serif; background: var(--bg); color: var(--text-primary); font-size: 14px; }
-    .cc-layout { display: flex; height: 100vh; overflow: hidden; }
-    .cc-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-    .topbar { height: 52px; background: var(--surface); border-bottom: 0.5px solid var(--border-md); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex-shrink: 0; }
-    .topbar-left { display: flex; align-items: center; gap: 8px; }
-    .topbar-title { font-family: 'Playfair Display', serif; font-size: 14px; color: var(--text-primary); }
-    .topbar-title em { font-style: italic; color: var(--blue-600); }
-    .topbar-sep { color: var(--text-muted); }
-    .topbar-page { font-size: 13px; color: var(--text-secondary); }
-    .topbar-user { font-size: 12px; background: var(--blue-50); color: var(--blue-800); padding: 3px 10px; border-radius: 20px; font-weight: 500; }
-    .content-area { flex: 1; overflow-y: auto; padding: 28px; }
+      --bg:           #f5f0e8;
+      --surface:      #fdfaf5;
+      --surface-2:    #faf6ef;
+      --border:       #e8dfd0;
+      --border-md:    #d8cfc0;
+      --text:         #4a3728;
+      --muted:        #9b8776;
+      --brown:        #7d5a4a;
+      --brown-d:      #5a3a2a;
 
-    .q-steps { display: flex; align-items: center; margin-bottom: 32px; max-width: 640px; }
+      --c-blue:       #b8cfe8;
+      --c-blue-d:     #4a7fa8;
+      --c-blue-bg:    #eaf2fb;
+
+      --c-mint:       #cce8dc;
+      --c-mint-d:     #3a8a6a;
+      --c-mint-bg:    #eaf7f2;
+
+      --c-peach:      #f5ddd0;
+      --c-peach-d:    #b86040;
+      --c-peach-bg:   #fdf2ec;
+
+      --c-pink:       #f0d5d5;
+      --c-pink-d:     #c05858;
+      --c-pink-bg:    #fceaea;
+
+      --c-lav:        #ddd5f0;
+      --c-lav-d:      #7a6ab8;
+      --c-lav-bg:     #f2eefb;
+
+      --c-sage:       #cce0c0;
+      --c-sage-d:     #4a7a3a;
+      --c-sage-bg:    #eef6ea;
+
+      --radius-sm:    10px;
+      --radius-md:    16px;
+      --radius-lg:    22px;
+      --shadow-sm:    0 2px 10px rgba(90,58,42,.07);
+      --shadow-md:    0 4px 20px rgba(90,58,42,.11);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Nunito', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    body {
+      background-image:
+        radial-gradient(circle at 10% 15%, rgba(184,207,232,.20) 0%, transparent 45%),
+        radial-gradient(circle at 88% 80%, rgba(204,232,220,.18) 0%, transparent 45%);
+    }
+
+    .cc-layout { display: flex; height: 100vh; overflow: hidden; }
+    .cc-main   { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar {
+      height: 56px;
+      background: var(--surface);
+      border-bottom: 1.5px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 28px; flex-shrink: 0;
+      gap: 8px;
+      font-family: 'Quicksand', sans-serif;
+    }
+    .topbar-title { font-size: 15px; font-weight: 700; color: var(--brown-d); }
+    .topbar-sep   { color: var(--border-md); }
+    .topbar-page  { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+    .content-area {
+      flex: 1; overflow-y: auto;
+      padding: 32px 32px 56px;
+    }
+    .content-area::-webkit-scrollbar { width: 5px; }
+    .content-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+    .notice-bar {
+      max-width: 660px;
+      border-radius: var(--radius-md);
+      padding: 13px 18px;
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 22px;
+      font-size: 13px; font-weight: 600;
+      border: 1.5px solid transparent;
+    }
+    .notice-success { background: var(--c-mint-bg); border-color: var(--c-mint); color: var(--c-mint-d); }
+    .notice-error   { background: var(--c-pink-bg); border-color: var(--c-pink); color: var(--c-pink-d); }
+    .notice-info    { background: var(--c-blue-bg); border-color: var(--c-blue); color: var(--c-blue-d); }
+
+    .notice-bar a { color: inherit; font-weight: 700; text-decoration: underline; }
+    .notice-bar a:hover { opacity: .8; }
+
+    .q-steps {
+      display: flex; align-items: center;
+      margin-bottom: 28px; max-width: 660px;
+    }
     .q-step { display: flex; align-items: center; flex: 1; }
     .q-step:last-child { flex: 0; }
-    .step-circle { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--border-md); background: var(--surface); color: var(--text-muted); font-size: 12px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
-    .step-line { flex: 1; height: 1px; background: var(--border-md); margin: 0 4px; }
-    .q-step.done .step-circle { background: var(--blue-600); border-color: var(--blue-600); color: #fff; }
-    .q-step.active .step-circle { border-color: var(--blue-600); color: var(--blue-600); font-weight: 700; }
 
-    .q-panel { display: none; animation: fadeUp 0.25s ease both; }
-    .q-panel.active { display: block; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .step-pill {
+      height: 30px; min-width: 30px; padding: 0 12px;
+      border-radius: 30px;
+      border: 2px solid var(--border-md);
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 11.5px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      flex-shrink: 0;
+      transition: all 0.2s;
+      white-space: nowrap;
+      font-family: 'Quicksand', sans-serif;
+    }
 
-    .q-card { background: var(--surface); border: 0.5px solid var(--border-md); border-radius: 16px; padding: 28px 28px 24px; max-width: 640px; }
-    .q-section-label { font-size: 11px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue-600); margin-bottom: 6px; }
-    .q-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 500; margin-bottom: 4px; }
-    .q-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 24px; }
+    .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 6px; border-radius: 2px; }
 
-    .opt-group { display: flex; flex-direction: column; gap: 8px; }
-    .opt-btn { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border: 1px solid var(--border-md); border-radius: 10px; background: var(--bg); cursor: pointer; text-align: left; transition: border-color 0.15s, background 0.15s; width: 100%; font-family: inherit; font-size: 14px; color: var(--text-primary); }
-    .opt-btn:hover { border-color: var(--blue-600); background: var(--blue-50); }
-    .opt-btn.selected { border-color: var(--blue-600); background: var(--blue-50); color: var(--blue-800); }
-    .opt-label { font-weight: 500; line-height: 1.2; }
-    .opt-desc { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+    .q-step.done .step-pill {
+      background: var(--c-mint-bg); border-color: var(--c-mint);
+      color: var(--c-mint-d);
+    }
+    .q-step.active .step-pill {
+      background: var(--brown); border-color: var(--brown);
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(125,90,74,.3);
+    }
+    .q-step.done .step-line { background: var(--c-mint); }
 
-    .opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .opt-check { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid var(--border-md); border-radius: 10px; background: var(--bg); cursor: pointer; transition: border-color 0.15s, background 0.15s; user-select: none; }
-    .opt-check:hover { border-color: var(--blue-600); background: var(--blue-50); }
-    .opt-check.selected { border-color: var(--blue-600); background: var(--blue-50); color: var(--blue-800); }
+    .q-panel { display: none; }
+    .q-panel.active { display: block; animation: popIn .3s cubic-bezier(.34,1.56,.64,1) both; }
+
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(10px) scale(.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .q-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 30px 30px 24px;
+      max-width: 660px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .q-section-label {
+      font-size: 10.5px; font-weight: 800;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 6px;
+    }
+
+    .q-title {
+      font-family: 'Quicksand', sans-serif;
+      font-size: 22px; font-weight: 700;
+      color: var(--brown-d); margin-bottom: 4px;
+    }
+
+    .q-subtitle {
+      font-size: 13px; color: var(--muted); margin-bottom: 26px;
+      font-weight: 500; line-height: 1.6;
+    }
+
+    .q-block { margin-bottom: 26px; }
+    .q-block:last-of-type { margin-bottom: 0; }
+
+    .q-label {
+      font-size: 13px; font-weight: 700;
+      color: var(--brown); margin-bottom: 10px; display: block;
+    }
+    .q-label span { font-weight: 500; color: var(--muted); }
+
+    .opt-group { display: flex; flex-direction: column; gap: 7px; }
+
+    .opt-btn {
+      display: flex; align-items: center; gap: 14px;
+      padding: 12px 16px;
+      border: 1.5px solid var(--border-md);
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      cursor: pointer; text-align: left;
+      transition: border-color .15s, background .15s, transform .1s;
+      width: 100%; font-family: 'Nunito', sans-serif;
+      font-size: 13.5px; color: var(--text);
+    }
+    .opt-btn:hover {
+      border-color: var(--brown);
+      background: var(--bg);
+      transform: translateX(2px);
+    }
+    .opt-btn.selected {
+      border-color: var(--brown);
+      background: #fdf4ee;
+      color: var(--brown-d);
+    }
+
+    .opt-dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid var(--border-md);
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .opt-btn.selected .opt-dot {
+      background: var(--brown); border-color: var(--brown);
+    }
+    .opt-dot-inner {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #fff; opacity: 0; transition: opacity .15s;
+    }
+    .opt-btn.selected .opt-dot-inner { opacity: 1; }
+
+    .opt-text-main { font-weight: 600; line-height: 1.2; }
+    .opt-text-sub  { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 500; }
+
+    .opt-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .opt-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+
+    .opt-check {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border-md);
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      cursor: pointer;
+      transition: border-color .15s, background .15s;
+      user-select: none; font-size: 13px; font-weight: 600;
+    }
+    .opt-check:hover { border-color: var(--brown); background: var(--bg); }
+    .opt-check.selected { border-color: var(--brown); background: #fdf4ee; color: var(--brown-d); }
     .opt-check input[type=checkbox] { display: none; }
-    .check-box { width: 16px; height: 16px; border: 1.5px solid var(--border-md); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
-    .opt-check.selected .check-box { background: var(--blue-600); border-color: var(--blue-600); }
+
+    .check-box {
+      width: 18px; height: 18px; border-radius: 5px;
+      border: 2px solid var(--border-md);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; transition: all .15s;
+    }
+    .opt-check.selected .check-box { background: var(--brown); border-color: var(--brown); }
     .check-icon { display: none; color: #fff; font-size: 9px; }
     .opt-check.selected .check-icon { display: block; }
 
-    .q-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; padding-top: 20px; border-top: 0.5px solid var(--border); }
-    .btn-prev { background: none; border: 1px solid var(--border-md); border-radius: 8px; padding: 9px 20px; font-size: 13px; font-family: inherit; cursor: pointer; color: var(--text-secondary); transition: background 0.12s; }
-    .btn-prev:hover { background: var(--bg); }
-    .btn-next { background: var(--blue-600); border: none; border-radius: 8px; padding: 9px 24px; font-size: 13px; font-family: inherit; cursor: pointer; color: #fff; font-weight: 500; transition: background 0.12s; }
-    .btn-next:hover { background: var(--blue-800); }
-    .btn-submit { background: #27500A; border: none; border-radius: 8px; padding: 9px 24px; font-size: 13px; font-family: inherit; cursor: pointer; color: #fff; font-weight: 500; transition: background 0.12s; }
-    .btn-submit:hover { background: #1d3a07; }
-    .step-counter { font-size: 12px; color: var(--text-muted); }
+    .q-divider {
+      height: 1.5px; background: var(--border);
+      border-radius: 2px; margin: 24px 0;
+    }
 
-    .notice-bar { background: var(--blue-50); border: 1px solid rgba(24,95,165,0.2); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; margin-bottom: 20px; font-size: 13px; color: var(--blue-800); max-width: 640px; }
+    .q-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 26px; padding-top: 20px;
+      border-top: 1.5px solid var(--border);
+    }
+
+    .btn-prev {
+      background: none; border: 1.5px solid var(--border-md);
+      border-radius: 50px; padding: 9px 22px;
+      font-size: 13px; font-family: 'Nunito', sans-serif; font-weight: 700;
+      cursor: pointer; color: var(--muted);
+      transition: background .12s, border-color .12s, color .12s;
+    }
+    .btn-prev:hover { background: var(--bg); border-color: var(--brown); color: var(--brown); }
+
+    .btn-next {
+      background: var(--brown); border: none; border-radius: 50px;
+      padding: 10px 26px; font-size: 13px;
+      font-family: 'Nunito', sans-serif; font-weight: 700;
+      cursor: pointer; color: #fff;
+      transition: background .12s, box-shadow .12s, transform .1s;
+      box-shadow: 0 3px 10px rgba(125,90,74,.28);
+    }
+    .btn-next:hover { background: var(--brown-d); transform: translateY(-1px); box-shadow: 0 5px 14px rgba(125,90,74,.35); }
+
+    .btn-submit {
+      background: var(--c-mint-d); border: none; border-radius: 50px;
+      padding: 10px 26px; font-size: 13px;
+      font-family: 'Nunito', sans-serif; font-weight: 700;
+      cursor: pointer; color: #fff;
+      transition: background .12s, box-shadow .12s, transform .1s;
+      box-shadow: 0 3px 10px rgba(58,138,106,.28);
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-submit:hover { background: #2d7a58; transform: translateY(-1px); box-shadow: 0 5px 14px rgba(58,138,106,.35); }
+
+    .step-counter { font-size: 12px; color: var(--muted); font-weight: 600; }
+
+    .text-input {
+      width: 100%;
+      padding: 11px 16px;
+      border: 1.5px solid var(--border-md);
+      border-radius: var(--radius-sm);
+      background: var(--surface-2);
+      font-family: 'Nunito', sans-serif;
+      font-size: 13.5px; color: var(--text);
+      outline: none;
+      transition: border-color .15s;
+    }
+    .text-input:focus { border-color: var(--brown); background: var(--surface); }
+    .text-input::placeholder { color: var(--muted); }
+
+    .tag-pill {
+      display: inline-block; padding: 3px 10px;
+      border-radius: 20px; font-size: 11px; font-weight: 700;
+      background: var(--c-peach-bg); color: var(--c-peach-d);
+      border: 1px solid var(--c-peach); margin-left: 6px;
+    }
   </style>
 </head>
 <body>
@@ -188,34 +436,34 @@ $user_age    = 'Not specified';
 
   <div class="cc-main">
     <div class="topbar">
-      <div class="topbar-left">
-        <span class="topbar-title">ContraChoice</span>
-        <span class="topbar-sep">›</span>
-        <span class="topbar-page"><?= htmlspecialchars($page_title)?></span>
-      </div>
+      <span class="topbar-title">ContraChoice</span>
+      <span class="topbar-sep">›</span>
+      <span class="topbar-page"><?= htmlspecialchars($page_title) ?></span>
     </div>
 
     <div class="content-area">
 
       <?php if ($success): ?>
-      <div class="notice-bar" style="background:#eaf3de;border-color:rgba(39,80,10,0.2);color:#27500A;">
-        <i class="fa-solid fa-circle-check"></i> <?= $success ?>
-        <a href="/hci/user/recommendations.php" class="ms-2 fw-medium" style="color:#27500A;">View Recommendations →</a>
+      <div class="notice-bar notice-success">
+        <i class="fa-solid fa-circle-check"></i>
+        <?= $success ?>
+        <a href="/hci/user/recommendations.php" class="ms-2">View Recommendations</a>
       </div>
       <?php endif; ?>
 
       <?php if ($error): ?>
-      <div class="notice-bar" style="background:#fcebeb;border-color:rgba(163,45,45,0.2);color:#A32D2D;">
-        <i class="fa-solid fa-circle-exclamation"></i> <?= htmlspecialchars($error) ?>
+      <div class="notice-bar notice-error">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <?= htmlspecialchars($error) ?>
       </div>
       <?php endif; ?>
 
       <?php if ($has_existing && !$success): ?>
-      <div class="notice-bar">
+      <div class="notice-bar notice-info">
         <i class="fa-solid fa-rotate"></i>
-        You've already completed the questionnaire.
-        <a href="#" onclick="document.getElementById('q-form-wrap').style.display='block';this.closest('.notice-bar').style.display='none';return false;" class="ms-2 fw-medium" style="color:var(--blue-800);">Retake →</a>
-        <a href="/hci/user/recommendations.php" class="ms-2 fw-medium" style="color:var(--blue-800);">View results →</a>
+        You have already completed the questionnaire.
+        <a href="#" onclick="document.getElementById('q-form-wrap').style.display='block';this.closest('.notice-bar').style.display='none';return false;" class="ms-2">Retake</a>
+        <a href="/hci/user/recommendations.php" class="ms-2">View results</a>
       </div>
       <div id="q-form-wrap" style="display:none;">
       <?php else: ?>
@@ -223,239 +471,385 @@ $user_age    = 'Not specified';
       <?php endif; ?>
 
         <div class="q-steps" id="q-steps">
-          <?php for ($i = 1; $i <= 4; $i++): ?>
+          <?php
+          $step_labels = ['Personal','Health','Family','Preferences'];
+          for ($i = 1; $i <= 5; $i++):
+            $label = $step_labels[$i - 1] ?? '';
+          ?>
             <div class="q-step <?= $i === 1 ? 'active' : '' ?>" id="step-ind-<?= $i ?>">
-              <div class="step-circle"><?= $i ?></div>
-              <?php if ($i < 4): ?><div class="step-line"></div><?php endif; ?>
+              <div class="step-pill">
+                <?php if ($i < 5): ?>
+                  <?= $i ?>. <?= $step_labels[$i-1] ?>
+                <?php else: ?>
+                  5. Preferences
+                <?php endif; ?>
+              </div>
+              <?php if ($i < 5): ?><div class="step-line"></div><?php endif; ?>
             </div>
           <?php endfor; ?>
         </div>
 
         <form method="POST" id="q-form">
 
+          <!-- ── STEP 1: Personal ── -->
           <div class="q-panel active" id="panel-1">
             <div class="q-card">
-              <div class="q-section-label">Step 1 of 4</div>
-              <div class="q-title">About You</div>
-              <div class="q-subtitle">Please answer a few questions to help us understand your needs.</div>
+              <div class="q-section-label">Step 1 of 5</div>
+              <div class="q-title">Personal Information</div>
+              <div class="q-subtitle">Basic details to help us provide age-appropriate recommendations.</div>
 
-              <div class="mb-4">
-                <div class="fw-medium mb-2" style="font-size:13px;">Are you currently sexually active?</div>
-                <div class="opt-group" data-name="sexually_active">
-                  <button type="button" class="opt-btn" data-val="yes">
-                    <div><div class="opt-label">Yes</div></div>
+              <div class="q-block">
+                <span class="q-label">What is your age range?</span>
+                <div class="opt-group opt-grid-3" data-name="age_range" id="age_range-group" style="display:grid;">
+                  <button type="button" class="opt-btn" data-val="under_18">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Under 18</div></div>
                   </button>
-                  <button type="button" class="opt-btn" data-val="no">
-                    <div><div class="opt-label">No</div></div>
+                  <button type="button" class="opt-btn" data-val="18_to_24">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">18 – 24</div></div>
+                  </button>
+                  <button type="button" class="opt-btn" data-val="25_to_34">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">25 – 34</div></div>
+                  </button>
+                  <button type="button" class="opt-btn" data-val="35_to_44">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">35 – 44</div></div>
+                  </button>
+                  <button type="button" class="opt-btn" data-val="45_plus">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">45 or older</div></div>
+                  </button>
+                </div>
+                <input type="hidden" name="age_range" id="val-age_range">
+              </div>
+
+              <div class="q-divider"></div>
+
+              <div class="q-block">
+                <span class="q-label">What is your relationship status?</span>
+                <div class="opt-group" data-name="relationship_status">
+                  <button type="button" class="opt-btn" data-val="single">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Single / Not in a relationship</div></div>
+                  </button>
+                  <button type="button" class="opt-btn" data-val="committed">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">In a committed relationship</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="prefer_not_to_say">
-                    <div><div class="opt-label">Prefer not to say</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Prefer not to say</div></div>
+                  </button>
+                </div>
+                <input type="hidden" name="relationship_status" id="val-relationship_status">
+              </div>
+
+              <div class="q-divider"></div>
+
+              <div class="q-block">
+                <span class="q-label">Are you currently sexually active?</span>
+                <div class="opt-group" data-name="sexually_active">
+                  <button type="button" class="opt-btn" data-val="yes">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Yes</div></div>
+                  </button>
+                  <button type="button" class="opt-btn" data-val="no">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">No</div></div>
+                  </button>
+                  <button type="button" class="opt-btn" data-val="prefer_not_to_say">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Prefer not to say</div></div>
                   </button>
                 </div>
                 <input type="hidden" name="sexually_active" id="val-sexually_active">
               </div>
 
-              <div class="mb-2">
-                <div class="fw-medium mb-2" style="font-size:13px;">Are you currently breastfeeding?</div>
-                <div class="opt-group" data-name="is_breastfeeding">
+              <div class="q-nav">
+                <span class="step-counter">1 of 5</span>
+                <button type="button" class="btn-next" onclick="nextPanel(1)">Next</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── STEP 2: Health ── -->
+          <div class="q-panel" id="panel-2">
+            <div class="q-card">
+              <div class="q-section-label">Step 2 of 5</div>
+              <div class="q-title">Your Health</div>
+              <div class="q-subtitle">This helps us avoid recommending methods that may not be safe for you.</div>
+
+              <div class="q-block">
+                <span class="q-label">Do you have any of these health conditions?</span>
+                <div class="opt-grid-2" id="health-grid" style="display:grid;">
+                  <?php
+                  $conditions = [
+                    'none'          => ['None / Not sure',            ''],
+                    'hypertension'  => ['High blood pressure',         ''],
+                    'migraines'     => ['Migraines',                   ''],
+                    'diabetes'      => ['Diabetes',                    ''],
+                    'blood_clots'   => ['History of blood clots',      ''],
+                    'liver_disease' => ['Liver disease',               ''],
+                    'depression'    => ['Depression / Anxiety',        ''],
+                  ];
+                  foreach ($conditions as $val => [$label, $sub]): ?>
+                  <label class="opt-check" data-val="<?= $val ?>">
+                    <input type="checkbox" name="health_conditions[]" value="<?= $val ?>">
+                    <div class="check-box"><i class="fa-solid fa-check check-icon"></i></div>
+                    <div>
+                      <div style="font-weight:600;"><?= $label ?></div>
+                      <?php if ($sub): ?><div style="font-size:11.5px;color:var(--muted);margin-top:1px;"><?= $sub ?></div><?php endif; ?>
+                    </div>
+                  </label>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <div class="q-divider"></div>
+
+              <div class="q-block">
+                <span class="q-label">How would you describe your menstrual cycle?</span>
+                <div class="opt-group" data-name="cycle_regularity">
+                  <button type="button" class="opt-btn" data-val="regular">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div>
+                      <div class="opt-text-main">Regular</div>
+                      <div class="opt-text-sub">Consistent, predictable cycle</div>
+                    </div>
+                  </button>
+                  <button type="button" class="opt-btn" data-val="irregular">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div>
+                      <div class="opt-text-main">Irregular</div>
+                      <div class="opt-text-sub">Unpredictable or varying cycle</div>
+                    </div>
+                  </button>
+                  <button type="button" class="opt-btn" data-val="not_sure">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div>
+                      <div class="opt-text-main">Not sure</div>
+                      <div class="opt-text-sub">I am not certain</div>
+                    </div>
+                  </button>
+                </div>
+                <input type="hidden" name="cycle_regularity" id="val-cycle_regularity">
+              </div>
+
+              <div class="q-divider"></div>
+
+              <div class="q-block">
+                <span class="q-label">Do you smoke?</span>
+                <div class="opt-group" data-name="is_smoker">
                   <button type="button" class="opt-btn" data-val="yes">
-                    <div><div class="opt-label">Yes</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Yes</div><div class="opt-text-sub">Current smoker</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="no">
-                    <div><div class="opt-label">No</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">No</div><div class="opt-text-sub">Non-smoker or ex-smoker</div></div>
+                  </button>
+                </div>
+                <input type="hidden" name="is_smoker" id="val-is_smoker">
+              </div>
+
+              <div class="q-divider"></div>
+
+              <div class="q-block" style="margin-bottom:0;">
+                <span class="q-label">Are you currently breastfeeding?</span>
+                <div class="opt-group" data-name="is_breastfeeding">
+                  <button type="button" class="opt-btn" data-val="yes">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Yes</div></div>
+                  </button>
+                  <button type="button" class="opt-btn" data-val="no">
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">No</div></div>
                   </button>
                 </div>
                 <input type="hidden" name="is_breastfeeding" id="val-is_breastfeeding">
               </div>
 
               <div class="q-nav">
-                <span class="step-counter">1 of 4</span>
-                <button type="button" class="btn-next" onclick="nextPanel(1)">Next →</button>
+                <button type="button" class="btn-prev" onclick="prevPanel(2)">Back</button>
+                <span class="step-counter">2 of 5</span>
+                <button type="button" class="btn-next" onclick="nextPanel(2)">Next</button>
               </div>
             </div>
           </div>
 
-          <div class="q-panel" id="panel-2">
-            <div class="q-card">
-              <div class="q-section-label">Step 2 of 4</div>
-              <div class="q-title">Your Health</div>
-              <div class="q-subtitle">This helps us avoid recommending methods that may not be safe for you.</div>
-
-              <div class="mb-4">
-                <div class="fw-medium mb-2" style="font-size:13px;">Do you have any of these health conditions? <span style="color:var(--text-muted);font-weight:400;">(Select all that apply)</span></div>
-                <div class="opt-grid" id="health-grid">
-                  <?php
-                  $conditions = [
-                    'none'         => 'None / Not sure',
-                    'hypertension' => 'High blood pressure',
-                    'migraines'    => 'Migraines',
-                    'diabetes'     => 'Diabetes',
-                    'blood_clots'  => 'History of blood clots',
-                    'liver_disease'=> 'Liver disease',
-                    'depression'   => 'Depression / Anxiety',
-                  ];
-                  foreach ($conditions as $val => $label): ?>
-                  <label class="opt-check" data-val="<?= $val ?>">
-                    <input type="checkbox" name="health_conditions[]" value="<?= $val ?>">
-                    <div class="check-box">
-                      <i class="fa-solid fa-check check-icon"></i>
-                    </div>
-                    <span style="font-size:13px;"><?= $label ?></span>
-                  </label>
-                  <?php endforeach; ?>
-                </div>
-              </div>
-
-              <div class="mb-2">
-                <div class="fw-medium mb-2" style="font-size:13px;">Do you smoke?</div>
-                <div class="opt-group" data-name="is_smoker">
-                  <button type="button" class="opt-btn" data-val="yes">
-                    <div><div class="opt-label">Yes</div></div>
-                  </button>
-                  <button type="button" class="opt-btn" data-val="no">
-                    <div><div class="opt-label">No</div></div>
-                  </button>
-                </div>
-                <input type="hidden" name="is_smoker" id="val-is_smoker">
-              </div>
-
-              <div class="q-nav">
-                <button type="button" class="btn-prev" onclick="prevPanel(2)">← Back</button>
-                <span class="step-counter">2 of 4</span>
-                <button type="button" class="btn-next" onclick="nextPanel(2)">Next →</button>
-              </div>
-            </div>
-          </div>
-
+          <!-- ── STEP 3: Family Planning ── -->
           <div class="q-panel" id="panel-3">
             <div class="q-card">
-              <div class="q-section-label">Step 3 of 4</div>
+              <div class="q-section-label">Step 3 of 5</div>
               <div class="q-title">Family Planning</div>
               <div class="q-subtitle">This helps us understand whether you need short-term or long-term protection.</div>
 
-              <div class="mb-4">
-                <div class="fw-medium mb-2" style="font-size:13px;">Do you want to have children in the future?</div>
+              <div class="q-block">
+                <span class="q-label">Do you want to have children in the future?</span>
                 <div class="opt-group" data-name="wants_children">
                   <button type="button" class="opt-btn" data-val="yes">
-                    <div><div class="opt-label">Yes</div><div class="opt-desc">I plan to have children someday</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Yes</div><div class="opt-text-sub">I plan to have children someday</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="no">
-                    <div><div class="opt-label">No</div><div class="opt-desc">I do not want children</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">No</div><div class="opt-text-sub">I do not want children</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="unsure">
-                    <div><div class="opt-label">Unsure</div><div class="opt-desc">I haven't decided yet</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Unsure</div><div class="opt-text-sub">I have not decided yet</div></div>
                   </button>
                 </div>
                 <input type="hidden" name="wants_children" id="val-wants_children">
               </div>
 
-              <div id="children-when-wrap" style="display:none;" class="mb-2">
-                <div class="fw-medium mb-2" style="font-size:13px;">How soon do you plan to have children?</div>
+              <div id="children-when-wrap" style="display:none;" class="q-block">
+                <div class="q-divider"></div>
+                <span class="q-label">How soon do you plan to have children?</span>
                 <div class="opt-group" data-name="children_when">
                   <button type="button" class="opt-btn" data-val="within_1yr">
-                    <div><div class="opt-label">Within the next year</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Within the next year</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="1_to_3yrs">
-                    <div><div class="opt-label">In 1–3 years</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">In 1 to 3 years</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="3yrs_plus">
-                    <div><div class="opt-label">More than 3 years from now</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">More than 3 years from now</div></div>
                   </button>
                 </div>
                 <input type="hidden" name="children_when" id="val-children_when" value="not_applicable">
               </div>
 
               <div class="q-nav">
-                <button type="button" class="btn-prev" onclick="prevPanel(3)">← Back</button>
-                <span class="step-counter">3 of 4</span>
-                <button type="button" class="btn-next" onclick="nextPanel(3)">Next →</button>
+                <button type="button" class="btn-prev" onclick="prevPanel(3)">Back</button>
+                <span class="step-counter">3 of 5</span>
+                <button type="button" class="btn-next" onclick="nextPanel(3)">Next</button>
               </div>
             </div>
           </div>
 
+          <!-- ── STEP 4: Preferences ── -->
           <div class="q-panel" id="panel-4">
             <div class="q-card">
-              <div class="q-section-label">Step 4 of 4</div>
+              <div class="q-section-label">Step 4 of 5</div>
               <div class="q-title">Your Preferences</div>
-              <div class="q-subtitle">Tell us what matters most to you so we can find the best match.</div>
+              <div class="q-subtitle">Tell us what matters most so we can find the best match for you.</div>
 
-              <div class="mb-4">
-                <div class="fw-medium mb-2" style="font-size:13px;">How do you prefer to use contraception?</div>
+              <div class="q-block">
+                <span class="q-label">How do you prefer to use contraception?</span>
                 <div class="opt-group" data-name="delivery_pref">
                   <button type="button" class="opt-btn" data-val="daily_pill">
-                    <div><div class="opt-label">Daily pill</div><div class="opt-desc">Take a pill every day</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Daily pill</div><div class="opt-text-sub">Take a pill every day</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="monthly_injection">
-                    <div><div class="opt-label">Injection</div><div class="opt-desc">Monthly or quarterly shot</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Injection</div><div class="opt-text-sub">Monthly or quarterly shot</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="long_term">
-                    <div><div class="opt-label">Long-term / Set and forget</div><div class="opt-desc">IUD, implant — years of protection</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Long-term / Set and forget</div><div class="opt-text-sub">IUD or implant — years of protection</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="barrier">
-                    <div><div class="opt-label">Barrier method</div><div class="opt-desc">Condoms, diaphragm</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Barrier method</div><div class="opt-text-sub">Condoms, diaphragm</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="natural">
-                    <div><div class="opt-label">Natural method</div><div class="opt-desc">Fertility awareness, calendar</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Natural method</div><div class="opt-text-sub">Fertility awareness, calendar method</div></div>
                   </button>
                 </div>
                 <input type="hidden" name="delivery_pref" id="val-delivery_pref">
               </div>
 
-              <div class="mb-4">
-                <div class="fw-medium mb-2" style="font-size:13px;">How important is a hormone-free method to you?</div>
+              <div class="q-divider"></div>
+
+              <div class="q-block" style="margin-bottom:0;">
+                <span class="q-label">How important is a hormone-free method to you?</span>
                 <div class="opt-group" data-name="hormone_free_pref">
                   <button type="button" class="opt-btn" data-val="very_important">
-                    <div><div class="opt-label">Very important</div><div class="opt-desc">I prefer to avoid hormones</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Very important</div><div class="opt-text-sub">I prefer to avoid hormones</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="somewhat">
-                    <div><div class="opt-label">Somewhat important</div><div class="opt-desc">I'm open to both</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Somewhat important</div><div class="opt-text-sub">I am open to both</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="not_important">
-                    <div><div class="opt-label">Not important</div><div class="opt-desc">Hormones are fine</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Not important</div><div class="opt-text-sub">Hormones are fine with me</div></div>
                   </button>
                 </div>
                 <input type="hidden" name="hormone_free_pref" id="val-hormone_free_pref">
               </div>
 
-              <div class="mb-4">
-                <div class="fw-medium mb-2" style="font-size:13px;">What is your budget preference?</div>
+              <div class="q-nav">
+                <button type="button" class="btn-prev" onclick="prevPanel(4)">Back</button>
+                <span class="step-counter">4 of 5</span>
+                <button type="button" class="btn-next" onclick="nextPanel(4)">Next</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── STEP 5: Budget & History ── -->
+          <div class="q-panel" id="panel-5">
+            <div class="q-card">
+              <div class="q-section-label">Step 5 of 5</div>
+              <div class="q-title">Budget & History</div>
+              <div class="q-subtitle">Last step — tell us about your budget and prior experience.</div>
+
+              <div class="q-block">
+                <span class="q-label">What is your budget preference?</span>
                 <div class="opt-group" data-name="budget_pref">
                   <button type="button" class="opt-btn" data-val="low">
-                    <div><div class="opt-label">Low cost</div><div class="opt-desc">Free or very affordable options</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Low cost</div><div class="opt-text-sub">Free or very affordable options</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="medium">
-                    <div><div class="opt-label">Moderate</div><div class="opt-desc">Willing to spend a reasonable amount</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Moderate</div><div class="opt-text-sub">Willing to spend a reasonable amount</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="high">
-                    <div><div class="opt-label">Not a concern</div><div class="opt-desc">Cost is not a deciding factor</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Not a concern</div><div class="opt-text-sub">Cost is not a deciding factor</div></div>
                   </button>
                 </div>
                 <input type="hidden" name="budget_pref" id="val-budget_pref">
               </div>
 
-              <div class="mb-4">
-                <div class="fw-medium mb-2" style="font-size:13px;">Have you used contraception before?</div>
+              <div class="q-divider"></div>
+
+              <div class="q-block">
+                <span class="q-label">Have you used contraception before?</span>
                 <div class="opt-group" data-name="used_before">
                   <button type="button" class="opt-btn" data-val="yes">
-                    <div><div class="opt-label">Yes</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">Yes</div></div>
                   </button>
                   <button type="button" class="opt-btn" data-val="no">
-                    <div><div class="opt-label">No, this is my first time</div></div>
+                    <div class="opt-dot"><div class="opt-dot-inner"></div></div>
+                    <div><div class="opt-text-main">No, this is my first time</div></div>
                   </button>
                 </div>
                 <input type="hidden" name="used_before" id="val-used_before">
               </div>
 
-              <div id="prev-method-wrap" style="display:none;" class="mb-2">
-                <label class="fw-medium mb-1 d-block" style="font-size:13px;">Which method did you use? <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
-                <input type="text" name="previous_method" id="previous_method" class="form-control form-control-sm" placeholder="e.g. Pills, condoms, IUD...">
+              <div id="prev-method-wrap" style="display:none;" class="q-block">
+                <div class="q-divider"></div>
+                <label class="q-label" for="previous_method">Which method did you use before? <span>(optional)</span></label>
+                <input type="text" name="previous_method" id="previous_method" class="text-input" placeholder="e.g. Pills, condoms, IUD...">
               </div>
 
               <div class="q-nav">
-                <button type="button" class="btn-prev" onclick="prevPanel(4)">← Back</button>
-                <span class="step-counter">4 of 4</span>
+                <button type="button" class="btn-prev" onclick="prevPanel(5)">Back</button>
+                <span class="step-counter">5 of 5</span>
                 <button type="submit" name="submit_questionnaire" class="btn-submit">
-                  <i class="fa-solid fa-paper-plane me-1"></i> Submit
+                  <i class="fa-solid fa-paper-plane"></i> Submit
                 </button>
               </div>
             </div>
@@ -470,7 +864,7 @@ $user_age    = 'Not specified';
 
 <script src="../assets/vendor/bootstrap-5/js/bootstrap.bundle.min.js"></script>
 <script>
-const TOTAL = 4;
+const TOTAL = 5;
 
 function showPanel(n) {
   document.querySelectorAll('.q-panel').forEach(p => p.classList.remove('active'));
@@ -481,6 +875,7 @@ function showPanel(n) {
     if (i < n)  ind.classList.add('done');
     if (i === n) ind.classList.add('active');
   }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function nextPanel(n) {
@@ -492,9 +887,16 @@ function prevPanel(n) {
   if (n > 1) showPanel(n - 1);
 }
 
+function shakeError(el) {
+  el.style.outline      = '2px solid var(--c-pink-d)';
+  el.style.borderRadius = '10px';
+  el.style.padding      = '4px';
+  setTimeout(() => { el.style.outline = ''; el.style.padding = ''; }, 1800);
+}
+
 function validatePanel(n) {
-  const panel  = document.getElementById('panel-' + n);
-  let valid    = true;
+  const panel = document.getElementById('panel-' + n);
+  let valid   = true;
 
   panel.querySelectorAll('.opt-group[data-name]').forEach(g => {
     const name   = g.dataset.name;
@@ -506,25 +908,12 @@ function validatePanel(n) {
       if (wrap && wrap.style.display === 'none') return;
     }
 
-    if (!hidden.value) {
-      g.style.outline      = '2px solid #e05252';
-      g.style.borderRadius = '10px';
-      g.style.padding      = '4px';
-      setTimeout(() => { g.style.outline = ''; g.style.padding = ''; }, 1800);
-      valid = false;
-    }
+    if (!hidden.value) { shakeError(g); valid = false; }
   });
 
   if (n === 2) {
     const anyChecked = document.querySelector('#health-grid input[type=checkbox]:checked');
-    if (!anyChecked) {
-      const grid = document.getElementById('health-grid');
-      grid.style.outline      = '2px solid #e05252';
-      grid.style.borderRadius = '10px';
-      grid.style.padding      = '4px';
-      setTimeout(() => { grid.style.outline = ''; grid.style.padding = ''; }, 1800);
-      valid = false;
-    }
+    if (!anyChecked) { shakeError(document.getElementById('health-grid')); valid = false; }
   }
 
   return valid;
@@ -534,7 +923,7 @@ document.addEventListener('click', function(e) {
   const btn = e.target.closest('.opt-btn');
   if (!btn) return;
 
-  const group = btn.closest('.opt-group[data-name]');
+  const group = btn.closest('[data-name]');
   if (!group) return;
 
   group.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
@@ -560,7 +949,7 @@ document.addEventListener('click', function(e) {
 });
 
 document.querySelectorAll('#health-grid .opt-check').forEach(el => {
-  el.addEventListener('click', function (e) {
+  el.addEventListener('click', function(e) {
     e.preventDefault();
     const val = this.dataset.val;
     const cb  = this.querySelector('input[type=checkbox]');
@@ -571,15 +960,11 @@ document.querySelectorAll('#health-grid .opt-check').forEach(el => {
         c.classList.remove('selected');
         c.querySelector('input[type=checkbox]').checked = false;
       });
-      if (!wasSelected) {
-        this.classList.add('selected');
-        cb.checked = true;
-      }
+      if (!wasSelected) { this.classList.add('selected'); cb.checked = true; }
     } else {
       const noneEl = document.querySelector('#health-grid .opt-check[data-val="none"]');
       noneEl.classList.remove('selected');
       noneEl.querySelector('input[type=checkbox]').checked = false;
-
       const isSelected = !this.classList.contains('selected');
       this.classList.toggle('selected', isSelected);
       cb.checked = isSelected;
