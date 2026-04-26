@@ -11,10 +11,8 @@ $page_title  = 'Anonymous Forum';
 $active_page = 'forum';
 $user_id     = $_SESSION['user_id'] ?? 0;
 
-// Helper: kung hindi logged in, ipakita ang error at huwag iproseso ang POST
 if ($user_id == 0 && $_SERVER['REQUEST_METHOD'] === 'POST') {
     $error = "You must be logged in to post, reply, or rate.";
-    // Huwag nang ipagpatuloy ang POST processing
 } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action']) && $_POST['action'] === 'add_post') {
         $content = trim($_POST['content'] ?? '');
@@ -36,7 +34,6 @@ if ($user_id == 0 && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param("iis", $post_id, $user_id, $content);
             $stmt->execute();
             $stmt->close();
-            // Update reply_count using prepared statement (iwas SQL injection)
             $updateStmt = $conn->prepare("UPDATE forum_posts SET reply_count = reply_count + 1 WHERE post_id = ?");
             $updateStmt->bind_param("i", $post_id);
             $updateStmt->execute();
@@ -62,7 +59,6 @@ if ($user_id == 0 && $_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $error = "Invalid rating value.";
         }
-        // Wala nang redirect – magre-reload ang page sa normal na POST flow
     }
 }
 
@@ -94,33 +90,90 @@ $posts = $stmt->get_result();
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($page_title) ?> — ContraChoice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/vendor/bootstrap-5/css/bootstrap.min.css">
   <link rel="stylesheet" href="../assets/vendor/fontawesome-7/css/all.min.css">
   <style>
     :root {
-      --bg-dirty: #f8f6f0;
-      --surface: #ffffff;
-      --border-soft: #e8e4dc;
-      --text-primary: #2c2b28;
-      --text-secondary: #6b6b67;
-      --blue-soft: #dceaf5;
-      --blue-600: #185FA5;
-      --blue-800: #0C447C;
+      --bg:         #f5f0e8;
+      --surface:    #fdfaf5;
+      --surface-2:  #faf6ef;
+      --border:     #e8dfd0;
+      --text:       #4a3728;
+      --muted:      #9b8776;
+      --accent-blue:   #b8cfe8;
+      --accent-blue-d: #6b9ab8;
+      --accent-pink:   #f0d5d5;
+      --accent-pink-d: #c47a7a;
+      --accent-mint:   #cce8dc;
+      --accent-mint-d: #5a9a7a;
+      --accent-peach:  #f5ddd0;
+      --accent-peach-d:#c47a55;
+      --accent-lav:    #ddd5f0;
+      --accent-lav-d:  #7a6ab8;
+      --brown:      #7d5a4a;
+      --brown-d:    #5a3a2a;
+      --radius-sm:  12px;
+      --radius-md:  18px;
+      --radius-lg:  24px;
+      --shadow-sm:  0 2px 8px rgba(120,80,50,.08);
+      --shadow-md:  0 4px 16px rgba(120,80,50,.12);
     }
-    body { background: var(--bg-dirty); font-family: 'Outfit', sans-serif; }
-    .cc-layout { display: flex; height: 100vh; overflow: hidden; }
-    .cc-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-dirty); }
-    .topbar {
-      height: 52px; background: var(--surface); border-bottom: 0.5px solid var(--border-soft);
-      display: flex; align-items: center; justify-content: space-between; padding: 0 24px;
-    }
-    .topbar-title { font-family: 'Playfair Display', serif; font-size: 14px; }
-    .topbar-title em { font-style: italic; color: var(--blue-600); }
-    .topbar-user { font-size: 12px; background: #eef2f0; padding: 4px 12px; border-radius: 30px; }
-    .content-area { flex: 1; overflow-y: auto; padding: 28px; }
 
-    /* Forum header */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      font-family: 'Nunito', sans-serif;
+      color: var(--text);
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(184,207,232,.18) 0%, transparent 50%),
+        radial-gradient(circle at 85% 75%, rgba(204,232,220,.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(240,213,213,.10) 0%, transparent 60%);
+    }
+    .cc-layout { display: flex; height: 100vh; overflow: hidden; }
+    .cc-main   { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+
+    .topbar {
+      height: 56px;
+      background: var(--surface);
+      border-bottom: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      flex-shrink: 0;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'Quicksand', sans-serif;
+    }
+    .topbar b {
+      color: var(--brown);
+      font-weight: 700;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    .topbar-sep {
+      color: var(--border);
+      font-size: 16px;
+    }
+    .topbar-page {
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 28px 48px;
+    }
+    .content-area::-webkit-scrollbar { width: 5px; }
+    .content-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
     .forum-header {
       display: flex;
       justify-content: space-between;
@@ -130,105 +183,124 @@ $posts = $stmt->get_result();
       gap: 16px;
     }
     .forum-header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 24px;
-      font-weight: 500;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--brown-d);
       margin: 0;
     }
     .forum-actions { display: flex; gap: 12px; align-items: center; }
     .sort-select {
       background: var(--surface);
-      border: 1px solid var(--border-soft);
-      border-radius: 30px;
-      padding: 8px 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      padding: 8px 18px;
       font-size: 13px;
-      font-family: inherit;
-      color: var(--text-primary);
+      font-family: 'Nunito', sans-serif;
+      font-weight: 500;
+      color: var(--text);
     }
     .btn-new-post {
-      background: var(--blue-600);
+      background: var(--brown);
       border: none;
-      border-radius: 30px;
-      padding: 8px 20px;
+      border-radius: 40px;
+      padding: 9px 22px;
       color: white;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 13px;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
+      box-shadow: 0 3px 10px rgba(125,90,74,.3);
     }
-    .btn-new-post:hover { background: var(--blue-800); }
+    .btn-new-post:hover { background: var(--brown-d); transform: translateY(-1px); }
 
-    /* Forum cards */
     .forum-card {
       background: var(--surface);
-      border: 1px solid var(--border-soft);
+      border: 1.5px solid var(--border);
       border-radius: 20px;
       margin-bottom: 20px;
       overflow: hidden;
-      transition: box-shadow 0.2s;
+      transition: box-shadow 0.2s, transform 0.15s;
     }
-    .forum-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    .forum-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
     .post-header {
       padding: 18px 24px 10px;
-      border-bottom: 1px solid var(--border-soft);
+      border-bottom: 1.5px solid var(--border);
     }
     .post-meta {
       font-size: 12px;
-      color: var(--text-secondary);
+      color: var(--muted);
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
+      font-weight: 600;
+    }
+    .reply-count-clickable {
+      cursor: pointer;
+      transition: color 0.15s;
+    }
+    .reply-count-clickable:hover {
+      color: var(--brown);
+      text-decoration: underline;
     }
     .anonymous-badge {
-      background: #eef2f0;
-      padding: 2px 10px;
-      border-radius: 30px;
+      background: var(--surface-2);
+      padding: 3px 12px;
+      border-radius: 40px;
       font-size: 11px;
+      font-weight: 700;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
+      border: 1px solid var(--border);
+      color: var(--brown);
     }
     .post-content {
       padding: 16px 24px;
       font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-      border-bottom: 1px solid var(--border-soft);
+      color: var(--text);
+      line-height: 1.65;
+      border-bottom: 1.5px solid var(--border);
+      font-weight: 500;
     }
     .reply-section {
       padding: 20px 24px;
-      background: #fefefc;
+      background: var(--surface-2);
+      display: none;
+    }
+    .reply-section.open {
+      display: block;
     }
     .reply-list {
       margin-bottom: 20px;
-      max-height: 300px;
+      max-height: 350px;
       overflow-y: auto;
     }
     .reply-item {
       padding: 12px 0;
-      border-bottom: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--border);
     }
     .reply-item:last-child { border-bottom: none; }
     .reply-meta {
       font-size: 11px;
-      color: var(--text-secondary);
+      color: var(--muted);
       margin-bottom: 6px;
       display: flex;
       gap: 8px;
       align-items: center;
       flex-wrap: wrap;
+      font-weight: 600;
     }
     .reply-content {
       font-size: 13px;
-      line-height: 1.5;
-      color: var(--text-primary);
+      line-height: 1.55;
+      color: var(--text);
       margin-bottom: 8px;
+      font-weight: 500;
     }
-
-    /* Star rating */
     .star-rating {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       margin-top: 6px;
     }
     .star-rating form { display: flex; align-items: center; gap: 2px; }
@@ -247,38 +319,64 @@ $posts = $stmt->get_result();
     .star-btn:hover { transform: scale(1.2); }
     .star-avg {
       font-size: 11px;
-      color: var(--text-secondary);
-      margin-left: 6px;
+      color: var(--muted);
+      margin-left: 4px;
+      font-weight: 600;
     }
-    .star-filled { color: #f0a500; }
-
     .reply-form textarea {
       width: 100%;
-      border: 1px solid var(--border-soft);
-      border-radius: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
       padding: 12px 16px;
-      font-family: inherit;
+      font-family: 'Nunito', sans-serif;
       font-size: 13px;
       resize: vertical;
+      background: var(--surface);
     }
+    .reply-form textarea:focus { outline: none; border-color: var(--brown); }
     .reply-form button {
-      margin-top: 10px;
-      background: var(--blue-600);
+      margin-top: 12px;
+      background: var(--brown);
       border: none;
-      padding: 8px 20px;
-      border-radius: 30px;
+      padding: 8px 22px;
+      border-radius: 40px;
       color: white;
-      font-weight: 500;
+      font-weight: 600;
       font-size: 12px;
+      transition: background 0.15s;
+    }
+    .reply-form button:hover { background: var(--brown-d); }
+    .reply-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .close-replies-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 30px;
+      transition: background 0.15s;
+    }
+    .close-replies-btn:hover {
+      background: var(--surface);
+      color: var(--brown);
     }
     .alert-custom {
       background: #eaf3de;
-      border-radius: 14px;
-      padding: 12px 18px;
+      border-radius: 16px;
+      padding: 12px 20px;
       margin-bottom: 20px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
+      font-weight: 600;
+      border: 1.5px solid #c8e0b0;
     }
     .pagination {
       display: flex;
@@ -288,49 +386,50 @@ $posts = $stmt->get_result();
       margin-bottom: 20px;
     }
     .pagination a, .pagination span {
-      padding: 6px 12px;
-      border-radius: 30px;
+      padding: 6px 14px;
+      border-radius: 40px;
       background: var(--surface);
-      border: 1px solid var(--border-soft);
+      border: 1.5px solid var(--border);
       text-decoration: none;
-      color: var(--text-secondary);
+      color: var(--text);
       font-size: 13px;
+      font-weight: 600;
+      transition: all 0.15s;
     }
+    .pagination a:hover { background: var(--surface-2); border-color: var(--brown); color: var(--brown-d); }
     .pagination .active {
-      background: var(--blue-600);
+      background: var(--brown);
       color: white;
-      border-color: var(--blue-600);
+      border-color: var(--brown);
     }
     .empty-forum {
       text-align: center;
       padding: 60px 24px;
       background: var(--surface);
-      border-radius: 20px;
-      border: 1px solid var(--border-soft);
+      border-radius: 24px;
+      border: 1.5px solid var(--border);
     }
-    .empty-forum i { font-size: 48px; color: var(--text-secondary); margin-bottom: 16px; }
-
-    /* Modal */
+    .empty-forum i { font-size: 52px; color: var(--muted); margin-bottom: 16px; }
     .modal-custom .modal-content {
-      border-radius: 20px;
+      border-radius: 24px;
       border: none;
       background: var(--surface);
     }
-    .modal-custom .modal-header { border-bottom: 1px solid var(--border-soft); padding: 20px 24px; }
-    .modal-custom .modal-body { padding: 24px; }
+    .modal-custom .modal-header { border-bottom: 1.5px solid var(--border); padding: 20px 26px; }
+    .modal-custom .modal-body { padding: 26px; }
     .modal-custom .form-control {
-      border: 1px solid var(--border-soft);
-      border-radius: 16px;
-      padding: 12px 16px;
-      font-family: 'Outfit', sans-serif;
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      padding: 12px 18px;
+      font-family: 'Nunito', sans-serif;
     }
     .modal-custom .btn-submit {
-      background: var(--blue-600);
+      background: var(--brown);
       border: none;
-      border-radius: 30px;
-      padding: 10px 24px;
+      border-radius: 40px;
+      padding: 10px 28px;
       color: white;
-      font-weight: 500;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -340,8 +439,8 @@ $posts = $stmt->get_result();
   <div class="cc-main">
     <div class="topbar">
       <div class="topbar-left">
-        <span class="topbar-title">ContraChoice</span>
-        <span class="topbar-sep">›</span>
+        <span><b>ContraChoice</b></span>
+        <span class="topbar-sep">/</span>
         <span class="topbar-page"><?= htmlspecialchars($page_title) ?></span>
       </div>
     </div>
@@ -350,7 +449,7 @@ $posts = $stmt->get_result();
       <?php if (isset($success)): ?>
         <div class="alert-custom"><i class="fas fa-check-circle text-success"></i> <?= htmlspecialchars($success) ?></div>
       <?php elseif (isset($error)): ?>
-        <div class="alert-custom" style="background:#fcebeb;"><i class="fas fa-exclamation-triangle text-danger"></i> <?= htmlspecialchars($error) ?></div>
+        <div class="alert-custom" style="background:#fcebeb; border-color:#f0c0c0;"><i class="fas fa-exclamation-triangle text-danger"></i> <?= htmlspecialchars($error) ?></div>
       <?php endif; ?>
 
       <div class="forum-header">
@@ -377,8 +476,6 @@ $posts = $stmt->get_result();
 
         <?php while ($post = $posts->fetch_assoc()):
           $post_id = $post['post_id'];
-
-          // Fetch replies with avg rating and user's own rating
           $reply_stmt = $conn->prepare("
             SELECT r.*,
               COALESCE(AVG(rt.rating), 0) AS avg_rating,
@@ -395,22 +492,25 @@ $posts = $stmt->get_result();
           $replies = $reply_stmt->get_result();
         ?>
         <div class="forum-card" id="post-<?= $post_id ?>">
-          <!-- Post header: no title, just meta -->
           <div class="post-header">
             <div class="post-meta">
               <span class="anonymous-badge"><i class="fas fa-user-secret"></i> Anonymous</span>
               <span><i class="far fa-calendar-alt"></i> <?= date('M d, Y g:i A', strtotime($post['created_at'])) ?></span>
-              <span><i class="far fa-comment-dots"></i> <?= $post['reply_count'] ?> replies</span>
+              <span class="reply-count-clickable" data-post-id="<?= $post_id ?>" onclick="toggleReplies(<?= $post_id ?>)">
+                <i class="far fa-comment-dots"></i> <?= $post['reply_count'] ?> replies
+              </span>
             </div>
           </div>
-
-          <!-- Post content (the question itself) -->
           <div class="post-content">
             <?= nl2br(htmlspecialchars($post['content'])) ?>
           </div>
-
-          <!-- Replies -->
-          <div class="reply-section">
+          <div class="reply-section" id="replies-<?= $post_id ?>">
+            <div class="reply-section-header">
+              <span class="anonymous-badge" style="background:var(--surface);"><i class="fas fa-reply-all"></i> Replies</span>
+              <button class="close-replies-btn" onclick="toggleReplies(<?= $post_id ?>)">
+                <i class="fas fa-times"></i> Close
+              </button>
+            </div>
             <div class="reply-list">
               <?php if ($replies->num_rows === 0): ?>
                 <p class="text-muted" style="font-size:13px;"><i class="far fa-comment"></i> No replies yet. Be the first to answer.</p>
@@ -426,8 +526,6 @@ $posts = $stmt->get_result();
                     <span><i class="far fa-clock"></i> <?= date('M d, Y g:i A', strtotime($reply['created_at'])) ?></span>
                   </div>
                   <div class="reply-content"><?= nl2br(htmlspecialchars($reply['content'])) ?></div>
-
-                  <!-- Star rating -->
                   <div class="star-rating">
                     <form method="POST" style="display:flex;align-items:center;gap:2px;">
                       <input type="hidden" name="action"   value="rate_reply">
@@ -457,8 +555,6 @@ $posts = $stmt->get_result();
                 <?php endwhile; ?>
               <?php endif; ?>
             </div>
-
-            <!-- Reply form -->
             <form method="POST" class="reply-form">
               <input type="hidden" name="action"   value="add_reply">
               <input type="hidden" name="post_id"  value="<?= $post_id ?>">
@@ -472,7 +568,6 @@ $posts = $stmt->get_result();
         <?php $reply_stmt->close(); endwhile; ?>
       <?php endif; ?>
 
-      <!-- Pagination -->
       <?php if ($total_pages > 1): ?>
       <div class="pagination">
         <?php if ($page > 1): ?>
@@ -495,7 +590,6 @@ $posts = $stmt->get_result();
   </div>
 </div>
 
-<!-- Post Modal (no title field) -->
 <div class="modal fade modal-custom" id="postModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
@@ -525,6 +619,13 @@ $posts = $stmt->get_result();
 
 <script src="../assets/vendor/bootstrap-5/js/bootstrap.bundle.min.js"></script>
 <script>
+function toggleReplies(postId) {
+  const repliesDiv = document.getElementById('replies-' + postId);
+  if (repliesDiv) {
+    repliesDiv.classList.toggle('open');
+  }
+}
+
 function hoverStars(btn, val) {
   const btns = btn.closest('form').querySelectorAll('.star-btn');
   btns.forEach((b, i) => b.style.color = i < val ? '#f0a500' : '#d1cfc6');

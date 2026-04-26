@@ -139,6 +139,14 @@ if ($q) {
              VALUES ($user_id, $response_id, $method_id, $sc, $rk)");
     }
 }
+
+function scoreColor(int $score): string {
+    if ($score >= 90) return '#27ae60';
+    if ($score >= 75) return '#8fbe3a';
+    if ($score >= 65) return '#f5a623';
+    if ($score >= 50) return '#f47c3c';
+    return '#e74c3c';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -147,16 +155,35 @@ if ($q) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($page_title) ?> — ContraChoice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Nunito:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/vendor/bootstrap-5/css/bootstrap.min.css">
   <link rel="stylesheet" href="../assets/vendor/fontawesome-7/css/all.min.css">
   <link rel="stylesheet" href="../assets/css/user/style.css">
   <style>
     :root {
-      --bg:        #fdf9f6;
-      --surface:   #ffffff;
-      --border:    rgba(0,0,0,0.07);
-      --border-md: rgba(0,0,0,0.10);
+      --bg:         #f5f0e8;
+      --surface:    #fdfaf5;
+      --surface-2:  #faf6ef;
+      --border:     #e8dfd0;
+      --text:       #4a3728;
+      --muted:      #9b8776;
+      --accent-blue:   #b8cfe8;
+      --accent-blue-d: #6b9ab8;
+      --accent-pink:   #f0d5d5;
+      --accent-pink-d: #c47a7a;
+      --accent-mint:   #cce8dc;
+      --accent-mint-d: #5a9a7a;
+      --accent-peach:  #f5ddd0;
+      --accent-peach-d:#c47a55;
+      --accent-lav:    #ddd5f0;
+      --accent-lav-d:  #7a6ab8;
+      --brown:      #7d5a4a;
+      --brown-d:    #5a3a2a;
+      --radius-sm:  12px;
+      --radius-md:  18px;
+      --radius-lg:  24px;
+      --shadow-sm:  0 2px 8px rgba(120,80,50,.08);
+      --shadow-md:  0 4px 16px rgba(120,80,50,.12);
 
       --orange:        #f47c3c;
       --orange-deep:   #d95f1a;
@@ -164,19 +191,13 @@ if ($q) {
       --orange-pale:   #fff0e8;
       --orange-soft:   #fff7f2;
       --orange-mid:    #fde4d0;
-
       --amber:         #f5a623;
       --amber-pale:    #fef6e0;
-
       --coral:         #f26b5e;
       --coral-pale:    #fdecea;
-
-      --brown:         #7a3b1e;
       --brown-soft:    #a0522d;
-
       --ink:           #2a1a0e;
       --ink-soft:      #4a3020;
-      --muted:         #9a7a62;
       --muted-lt:      #d4b89a;
     }
 
@@ -188,209 +209,141 @@ if ($q) {
     .topbar {
       height: 56px;
       background: var(--surface);
-      border-bottom: 1px solid var(--border-md);
+      border-bottom: 1.5px solid var(--border);
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 0 28px;
       flex-shrink: 0;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'Quicksand', sans-serif;
     }
-    .topbar-left { display: flex; align-items: center; gap: 8px; }
-    .topbar-title { font-family: 'Playfair Display', serif; font-size: 15px; font-weight: 700; color: var(--ink); }
-    .topbar-title span { color: var(--orange); }
-    .topbar-sep  { color: var(--muted-lt); }
-    .topbar-page { font-size: 13px; color: var(--muted); font-weight: 600; }
+    .topbar b {
+      color: var(--brown);
+      font-weight: 700;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    .topbar-sep {
+      color: var(--border);
+      font-size: 16px;
+    }
+    .topbar-page {
+      color: var(--muted);
+      font-weight: 500;
+    }
 
     .content-area { flex: 1; overflow-y: auto; padding: 32px 28px; }
+    .content-area::-webkit-scrollbar { width: 5px; }
+    .content-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
 
     .page-header { max-width: 980px; margin-bottom: 28px; display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
-    .page-header-left h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--ink);
-      margin-bottom: 4px;
-    }
+    .page-header-left h1 { font-family: 'Quicksand', sans-serif; font-size: 28px; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
     .page-header-left h1 span { color: var(--orange); }
     .page-header-left p { font-size: 13px; color: var(--muted); margin: 0; font-weight: 500; }
     .retake-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 12.5px;
-      font-weight: 700;
-      padding: 9px 20px;
-      border-radius: 30px;
-      background: var(--orange-pale);
-      color: var(--orange-deep);
-      text-decoration: none;
-      border: 2px solid rgba(217,95,26,0.2);
-      transition: background 0.18s, transform 0.15s;
-      white-space: nowrap;
+      display: inline-flex; align-items: center; gap: 7px;
+      font-size: 12.5px; font-weight: 700; padding: 9px 20px; border-radius: 30px;
+      background: var(--orange-pale); color: var(--orange-deep);
+      text-decoration: none; border: 2px solid rgba(217,95,26,0.2);
+      transition: background 0.18s, transform 0.15s; white-space: nowrap;
     }
     .retake-btn:hover { background: var(--orange); color: #fff; transform: translateY(-1px); text-decoration: none; border-color: var(--orange); }
 
     .recommendation-top-pick-wrap { max-width: 980px; margin-bottom: 28px; }
     .recommendation-top-pick-card {
-      border-radius: 24px;
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      min-height: 290px;
+      border-radius: 24px; overflow: hidden;
+      display: grid; grid-template-columns: 320px 1fr; min-height: 290px;
       box-shadow: 0 8px 48px rgba(244,124,60,0.20);
       animation: slideUp 0.5s ease both;
       border: 2px solid rgba(244,124,60,0.15);
     }
     @keyframes slideUp { from { opacity:0; transform: translateY(20px); } to { opacity:1; transform:none; } }
 
-    .recommendation-top-pick-img-side {
-      position: relative;
-      overflow: hidden;
-      background: var(--orange-pale);
-    }
-    .recommendation-top-pick-img-side img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
+    .recommendation-top-pick-img-side { position: relative; overflow: hidden; background: var(--orange-pale); }
+    .recommendation-top-pick-img-side img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .recommendation-top-pick-img-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
       background: linear-gradient(135deg, var(--orange-pale) 0%, var(--amber-pale) 100%);
     }
     .recommendation-top-pick-img-placeholder .method-icon {
-      width: 80px;
-      height: 80px;
-      background: var(--orange);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 32px;
+      width: 80px; height: 80px; background: var(--orange); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; color: #fff; font-size: 32px;
     }
     .recommendation-best-match-ribbon {
-      position: absolute;
-      top: 18px;
-      left: -2px;
-      background: var(--orange);
-      color: #fff;
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 6px 16px 6px 14px;
-      border-radius: 0 30px 30px 0;
+      position: absolute; top: 18px; left: -2px;
+      background: var(--orange); color: #fff;
+      font-size: 10px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 6px 16px 6px 14px; border-radius: 0 30px 30px 0;
       box-shadow: 0 3px 12px rgba(217,95,26,0.40);
     }
-
     .recommendation-top-pick-info-side {
       background: linear-gradient(135deg, #fffaf6 0%, #fff7ee 100%);
-      padding: 36px 40px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 16px;
+      padding: 36px 40px; display: flex; flex-direction: column; justify-content: center; gap: 16px;
     }
-    .recommendation-top-method-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 28px;
-      font-weight: 700;
-      color: var(--ink);
-      line-height: 1.15;
-    }
-    .recommendation-top-method-desc {
-      font-size: 13.5px;
-      color: var(--ink-soft);
-      line-height: 1.75;
-      font-weight: 400;
-    }
+    .recommendation-top-method-name { font-family: 'Quicksand', sans-serif; font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1.15; }
+    .recommendation-top-method-desc { font-size: 13.5px; color: var(--ink-soft); line-height: 1.75; font-weight: 400; }
     .recommendation-top-score-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
     .recommendation-top-score-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--orange);
-      color: #fff;
-      font-size: 13px;
-      font-weight: 800;
-      padding: 8px 20px;
-      border-radius: 30px;
-      box-shadow: 0 3px 12px rgba(244,124,60,0.35);
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--orange); color: #fff; font-size: 13px; font-weight: 800;
+      padding: 8px 20px; border-radius: 30px; box-shadow: 0 3px 12px rgba(244,124,60,0.35);
     }
     .recommendation-top-eff-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--orange-pale);
-      color: var(--orange-deep);
-      font-size: 12.5px;
-      font-weight: 700;
-      padding: 7px 16px;
-      border-radius: 30px;
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--orange-pale); color: var(--orange-deep);
+      font-size: 12.5px; font-weight: 700; padding: 7px 16px; border-radius: 30px;
       border: 1.5px solid rgba(217,95,26,0.2);
     }
     .recommendation-top-reasons-row { display: flex; flex-wrap: wrap; gap: 7px; }
     .recommendation-reason-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11.5px;
-      font-weight: 700;
-      padding: 5px 13px;
-      border-radius: 30px;
-      background: var(--orange-mid);
-      color: var(--orange-deep);
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 11.5px; font-weight: 700; padding: 5px 13px; border-radius: 30px;
+      background: var(--orange-mid); color: var(--orange-deep);
     }
     .recommendation-reason-chip i { font-size: 9px; }
     .recommendation-top-detail-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--orange);
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      padding: 10px 24px;
-      border-radius: 30px;
-      border: none;
-      cursor: pointer;
-      align-self: flex-start;
-      transition: background 0.18s, transform 0.15s;
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--orange); color: #fff; font-size: 13px; font-weight: 700;
+      padding: 10px 24px; border-radius: 30px; border: none; cursor: pointer;
+      align-self: flex-start; transition: background 0.18s, transform 0.15s;
       box-shadow: 0 3px 14px rgba(244,124,60,0.3);
     }
     .recommendation-top-detail-btn:hover { background: var(--orange-deep); transform: translateY(-1px); }
 
     .recommendation-others-label {
-      max-width: 980px;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
+      max-width: 980px; font-size: 11px; font-weight: 800; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 12px;
     }
     .recommendation-others-label::after { content:''; flex:1; height:1.5px; background: var(--orange-mid); }
+
+    .score-legend {
+      max-width: 980px; display: flex; align-items: center; gap: 8px;
+      flex-wrap: wrap; margin-bottom: 16px;
+      font-size: 11px; font-weight: 700; color: var(--muted);
+    }
+    .score-legend strong { color: var(--ink-soft); font-size: 11px; margin-right: 2px; }
+    .legend-item {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 10px 3px 7px; border-radius: 20px;
+      background: rgba(0,0,0,.04);
+    }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
 
     .recommendation-list { max-width: 980px; display: flex; flex-direction: column; gap: 12px; }
 
     .recommendation-card {
-      background: var(--surface);
-      border: 2px solid var(--border-md);
-      border-radius: 18px;
-      overflow: hidden;
-      display: grid;
-      grid-template-columns: 130px 1fr auto;
+      background: var(--surface); border: 2px solid var(--border);
+      border-radius: 18px; overflow: hidden;
+      display: grid; grid-template-columns: 130px 1fr auto;
       transition: box-shadow 0.18s, border-color 0.18s, transform 0.15s;
-      cursor: pointer;
-      animation: slideUp 0.4s ease both;
+      cursor: pointer; animation: slideUp 0.4s ease both;
     }
     .recommendation-card:hover { border-color: var(--orange); box-shadow: 0 6px 30px rgba(244,124,60,0.18); transform: translateY(-2px); }
     .recommendation-card:nth-child(1) { animation-delay: 0.06s; }
@@ -398,358 +351,166 @@ if ($q) {
     .recommendation-card:nth-child(3) { animation-delay: 0.18s; }
     .recommendation-card:nth-child(4) { animation-delay: 0.24s; }
 
-    .recommendation-card-img-col {
-      position: relative;
-      overflow: hidden;
-      min-height: 130px;
-    }
+    .recommendation-card-img-col { position: relative; overflow: hidden; min-height: 130px; }
     .recommendation-card-img-col img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .recommendation-card-img-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
     }
     .recommendation-card-img-placeholder .recommendation-method-icon-sm {
-      width: 52px;
-      height: 52px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 20px;
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px;
     }
 
     .recommendation-rank-badge {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 13px;
-      font-weight: 800;
-      color: #fff;
+      position: absolute; top: 10px; left: 10px;
+      width: 34px; height: 34px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: #fff;
       box-shadow: 0 2px 10px rgba(0,0,0,0.18);
     }
-    .recommendation-rank-2 { background: #f47c3c; }
-    .recommendation-rank-3 { background: #a78bda; }
-    .recommendation-rank-4 { background: #5bbfa0; }
-    .recommendation-rank-5 { background: #60a5d4; }
 
     .recommendation-card-body-col { padding: 18px 20px; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
     .recommendation-card-name-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .recommendation-card-name { font-family: 'Playfair Display', serif; font-size: 17px; font-weight: 700; color: var(--ink); }
+    .recommendation-card-name { font-family: 'Quicksand', sans-serif; font-size: 17px; font-weight: 700; color: var(--ink); }
 
-    .recommendation-cat-pill {
-      font-size: 10px;
-      font-weight: 800;
-      letter-spacing: 0.07em;
-      text-transform: uppercase;
-      padding: 3px 10px;
-      border-radius: 30px;
-    }
-    .recommendation-cat-hormonal  { background: var(--amber-pale);   color: #a06d00; }
-    .recommendation-cat-barrier   { background: var(--orange-pale);  color: var(--orange-deep); }
-    .recommendation-cat-long_term { background: var(--coral-pale);   color: var(--coral); }
-    .recommendation-cat-natural   { background: #f0f8ee;  color: #3a7a2a; }
-    .recommendation-cat-emergency { background: var(--orange-mid);   color: var(--brown); }
+    .recommendation-cat-pill { font-size: 10px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; padding: 3px 10px; border-radius: 30px; }
+    .recommendation-cat-hormonal  { background: var(--amber-pale);  color: #a06d00; }
+    .recommendation-cat-barrier   { background: var(--orange-pale); color: var(--orange-deep); }
+    .recommendation-cat-long_term { background: var(--coral-pale);  color: var(--coral); }
+    .recommendation-cat-natural   { background: #f0f8ee;            color: #3a7a2a; }
+    .recommendation-cat-emergency { background: var(--orange-mid);  color: var(--brown); }
 
     .recommendation-card-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.6; font-weight: 400; }
     .recommendation-card-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-    .recommendation-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11.5px;
-      font-weight: 700;
-      padding: 4px 11px;
-      border-radius: 30px;
-    }
-    .recommendation-chip-eff  { background: #e8f8ee; color: #2a7a4a; }
-    .recommendation-chip-cost { background: var(--amber-pale); color: #8a6000; }
+    .recommendation-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 700; padding: 4px 11px; border-radius: 30px; }
+    .recommendation-chip-eff   { background: #e8f8ee;           color: #2a7a4a; }
+    .recommendation-chip-cost  { background: var(--amber-pale);  color: #8a6000; }
     .recommendation-chip-match { background: var(--orange-pale); color: var(--orange-deep); }
 
     .recommendation-card-score-col {
-      padding: 18px 18px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      padding: 18px; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px;
       border-left: 1.5px solid var(--orange-mid);
-      min-width: 88px;
-      background: var(--orange-soft);
+      min-width: 88px; background: var(--orange-soft);
     }
     .recommendation-score-ring { width: 64px; height: 64px; position: relative; }
     .recommendation-score-ring svg { width: 64px; height: 64px; transform: rotate(-90deg); }
     .recommendation-score-ring .recommendation-ring-bg { fill: none; stroke: var(--orange-mid); stroke-width: 5; }
     .recommendation-score-label { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-    .recommendation-score-num-val { font-size: 16px; font-weight: 800; color: var(--ink); line-height: 1; }
+    .recommendation-score-num-val { font-size: 16px; font-weight: 800; line-height: 1; }
     .recommendation-score-num-sub { font-size: 9px; color: var(--muted); font-weight: 600; }
     .recommendation-score-caption { font-size: 10px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
 
     .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 70%; text-align: center; padding: 24px; }
     .empty-icon-wrap { width: 80px; height: 80px; border-radius: 50%; background: var(--orange-pale); display: flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 20px; color: var(--orange); }
-    .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
-    .empty-state p { font-size: 13.5px; color: var(--muted); max-width: 360px; line-height: 1.7; margin-bottom: 24px; font-weight: 500; }
+    .empty-state h3 { font-family: 'Quicksand', sans-serif; font-size: 22px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+    .empty-state p  { font-size: 13.5px; color: var(--muted); max-width: 360px; line-height: 1.7; margin-bottom: 24px; font-weight: 500; }
     .btn-start { display: inline-flex; align-items: center; gap: 8px; padding: 12px 28px; background: var(--orange); color: #fff; border-radius: 30px; font-size: 13.5px; font-weight: 800; text-decoration: none; transition: background 0.2s, transform 0.15s; }
     .btn-start:hover { background: var(--orange-deep); transform: translateY(-2px); color: #fff; text-decoration: none; }
 
     .recommendation-modal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 99999;
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100vw; height: 100vh; z-index: 99999;
       animation: fadeIn 0.22s ease;
     }
     .recommendation-modal-overlay.open { display: block; }
     @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
     .recommendation-modal-box {
-      display: grid;
-      grid-template-columns: 400px 1fr;
-      width: 100vw;
-      height: 100vh;
-      background: var(--surface);
+      display: grid; grid-template-columns: 400px 1fr;
+      width: 100vw; height: 100vh; background: var(--surface);
       animation: modalSlide 0.3s cubic-bezier(0.34,1.1,0.64,1) both;
     }
     @keyframes modalSlide { from { opacity:0; transform: translateX(30px); } to { opacity:1; transform:none; } }
 
-    .recommendation-modal-left-panel {
-      position: relative;
-      overflow: hidden;
-      background: var(--orange-pale);
-      height: 100vh;
-    }
+    .recommendation-modal-left-panel { position: relative; overflow: hidden; background: var(--orange-pale); height: 100vh; }
     .recommendation-modal-left-panel img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      display: block;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
+      max-width: 100%; max-height: 100%; object-fit: contain; display: block;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
     }
     .recommendation-modal-left-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
       background: linear-gradient(160deg, #fff0e8 0%, #fef6e0 50%, #fce8ef 100%);
-      position: relative;
-      z-index: 1;
+      position: relative; z-index: 1;
     }
     .recommendation-modal-left-placeholder .recommendation-hero-icon {
-      width: 140px;
-      height: 140px;
-      background: var(--orange);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 56px;
-      box-shadow: 0 16px 48px rgba(244,124,60,0.35);
+      width: 140px; height: 140px; background: var(--orange); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 56px; box-shadow: 0 16px 48px rgba(244,124,60,0.35);
     }
     .recommendation-modal-left-overlay {
-      position: absolute;
-      inset: 0;
+      position: absolute; inset: 0;
       background: linear-gradient(to top, rgba(42,26,14,0.65) 0%, rgba(42,26,14,0.1) 55%, transparent 100%);
       z-index: 2;
     }
-    .recommendation-modal-left-bottom {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      padding: 36px 40px;
-      z-index: 3;
-    }
+    .recommendation-modal-left-bottom { position: absolute; bottom: 0; left: 0; right: 0; padding: 36px 40px; z-index: 3; }
     .recommendation-modal-left-rank {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--orange);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      padding: 7px 20px;
-      border-radius: 30px;
-      margin-bottom: 14px;
+      display: inline-flex; align-items: center; gap: 7px;
+      background: var(--orange); color: #fff;
+      font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 7px 20px; border-radius: 30px; margin-bottom: 14px;
       box-shadow: 0 3px 14px rgba(244,124,60,0.45);
     }
-    .recommendation-modal-left-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 36px;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.15;
-      text-shadow: 0 2px 16px rgba(0,0,0,0.4);
-    }
+    .recommendation-modal-left-name { font-family: 'Quicksand', sans-serif; font-size: 36px; font-weight: 700; color: #fff; line-height: 1.15; text-shadow: 0 2px 16px rgba(0,0,0,0.4); }
 
-    .recommendation-modal-right-panel {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-      background: #fdfaf7;
-    }
+    .recommendation-modal-right-panel { display: flex; flex-direction: column; height: 100vh; overflow: hidden; background: #fdfaf7; }
     .recommendation-modal-right-topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 22px 40px;
-      border-bottom: 2px solid var(--orange-mid);
-      flex-shrink: 0;
-      background: var(--surface);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 40px; border-bottom: 2px solid var(--orange-mid);
+      flex-shrink: 0; background: var(--surface);
     }
-    .recommendation-modal-right-topbar-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 17px;
-      font-weight: 700;
-      color: var(--ink);
-    }
+    .recommendation-modal-right-topbar-title { font-family: 'Quicksand', sans-serif; font-size: 17px; font-weight: 700; color: var(--ink); }
     .recommendation-modal-close-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 12px;
-      background: var(--orange-pale);
-      border: 2px solid var(--orange-mid);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--orange-deep);
-      font-size: 16px;
-      transition: background 0.15s, transform 0.15s;
-      flex-shrink: 0;
+      width: 40px; height: 40px; border-radius: 12px;
+      background: var(--orange-pale); border: 2px solid var(--orange-mid);
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      color: var(--orange-deep); font-size: 16px;
+      transition: background 0.15s, transform 0.15s; flex-shrink: 0;
     }
     .recommendation-modal-close-btn:hover { background: var(--orange); color: #fff; transform: scale(1.05); }
 
     .recommendation-modal-right-scroll {
-      flex: 1;
-      overflow-y: auto;
-      padding: 36px 40px 48px;
-      scrollbar-width: thin;
-      scrollbar-color: var(--orange-mid) transparent;
+      flex: 1; overflow-y: auto; padding: 36px 40px 48px;
+      scrollbar-width: thin; scrollbar-color: var(--orange-mid) transparent;
     }
     .recommendation-modal-right-scroll::-webkit-scrollbar { width: 6px; }
-    .recommendation-modal-right-scroll::-webkit-scrollbar-track { background: transparent; }
     .recommendation-modal-right-scroll::-webkit-scrollbar-thumb { background: var(--orange-mid); border-radius: 10px; }
     .recommendation-modal-right-scroll::-webkit-scrollbar-thumb:hover { background: var(--orange-light); }
 
     .recommendation-modal-pills-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
-    .recommendation-modal-score-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: var(--orange);
-      color: #fff;
-      font-size: 12.5px;
-      font-weight: 800;
-      padding: 9px 20px;
-      border-radius: 30px;
-      box-shadow: 0 3px 12px rgba(244,124,60,0.35);
-    }
-    .recommendation-modal-eff-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #e8f8ee;
-      color: #2a7a4a;
-      font-size: 12.5px;
-      font-weight: 700;
-      padding: 9px 18px;
-      border-radius: 30px;
-    }
-    .recommendation-modal-cost-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #fef6e0;
-      color: #8a6000;
-      font-size: 12.5px;
-      font-weight: 700;
-      padding: 9px 18px;
-      border-radius: 30px;
-    }
-    .recommendation-modal-hf-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #eef5ff;
-      color: #2a5ba0;
-      font-size: 12.5px;
-      font-weight: 700;
-      padding: 9px 18px;
-      border-radius: 30px;
-    }
+    .recommendation-modal-score-pill { display: inline-flex; align-items: center; gap: 7px; color: #fff; font-size: 12.5px; font-weight: 800; padding: 9px 20px; border-radius: 30px; }
+    .recommendation-modal-eff-pill   { display: inline-flex; align-items: center; gap: 6px; background: #e8f8ee;   color: #2a7a4a; font-size: 12.5px; font-weight: 700; padding: 9px 18px; border-radius: 30px; }
+    .recommendation-modal-cost-pill  { display: inline-flex; align-items: center; gap: 6px; background: #fef6e0;   color: #8a6000; font-size: 12.5px; font-weight: 700; padding: 9px 18px; border-radius: 30px; }
+    .recommendation-modal-hf-pill    { display: inline-flex; align-items: center; gap: 6px; background: #eef5ff;   color: #2a5ba0; font-size: 12.5px; font-weight: 700; padding: 9px 18px; border-radius: 30px; }
 
     .recommendation-modal-section { margin-bottom: 28px; }
     .recommendation-modal-section-label {
-      font-size: 10.5px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.13em;
-      color: var(--orange);
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      font-size: 10.5px; font-weight: 800; text-transform: uppercase;
+      letter-spacing: 0.13em; color: var(--orange); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
     }
     .recommendation-modal-section-label::after { content:''; flex:1; height:1.5px; background: var(--orange-mid); }
     .recommendation-modal-section p { font-size: 14px; color: var(--ink-soft); line-height: 1.85; font-weight: 400; }
 
     .recommendation-modal-reasons { display: flex; flex-wrap: wrap; gap: 8px; }
     .recommendation-modal-reason-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 12.5px;
-      font-weight: 700;
-      padding: 7px 16px;
-      border-radius: 30px;
-      background: var(--orange-mid);
-      color: var(--orange-deep);
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 12.5px; font-weight: 700; padding: 7px 16px; border-radius: 30px;
+      background: var(--orange-mid); color: var(--orange-deep);
     }
-
     .recommendation-modal-disclaimer {
-      font-size: 13px;
-      color: var(--muted);
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      padding: 16px 20px;
-      background: var(--orange-soft);
-      border-radius: 14px;
-      border: 2px solid var(--orange-mid);
-      margin-top: 8px;
-      line-height: 1.6;
+      font-size: 13px; color: var(--muted);
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 16px 20px; background: var(--orange-soft);
+      border-radius: 14px; border: 2px solid var(--orange-mid);
+      margin-top: 8px; line-height: 1.6;
     }
 
     @media (max-width: 900px) {
-      .recommendation-modal-box {
-        grid-template-columns: 1fr;
-        grid-template-rows: 260px 1fr;
-        height: 100vh;
-      }
+      .recommendation-modal-box { grid-template-columns: 1fr; grid-template-rows: 260px 1fr; height: 100vh; }
       .recommendation-modal-left-panel { height: 260px; }
       .recommendation-modal-right-panel { height: calc(100vh - 260px); }
     }
-
     @media (max-width: 768px) {
       .recommendation-top-pick-card { grid-template-columns: 1fr; }
       .recommendation-top-pick-img-side { height: 180px; }
@@ -768,8 +529,8 @@ if ($q) {
   <div class="cc-main">
     <div class="topbar">
       <div class="topbar-left">
-        <span class="topbar-title">Contra<span>Choice</span></span>
-        <span class="topbar-sep">›</span>
+        <span><b>ContraChoice</b></span>
+        <span class="topbar-sep">/</span>
         <span class="topbar-page"><?= htmlspecialchars($page_title) ?></span>
       </div>
     </div>
@@ -796,7 +557,7 @@ if ($q) {
           'natural'   => 'fa-leaf',
           'emergency' => 'fa-bolt',
         ];
-        $top = $recommendations[0];
+        $top       = $recommendations[0];
         $topMethod = $top['method'];
         $topScore  = $top['score'];
         $topIcon   = $catIcons[$topMethod['category']] ?? 'fa-circle-dot';
@@ -805,7 +566,7 @@ if ($q) {
 
       <div class="page-header">
         <div class="page-header-left">
-          <h1>Your <span>Recommendations</span></h1>
+          <h1>Your Recommendations</h1>
           <p>Based on your answers, here are your best-matched contraceptive options.</p>
         </div>
         <a href="/hci/user/questionnaire.php" class="retake-btn">
@@ -854,17 +615,28 @@ if ($q) {
 
       <?php if (count($recommendations) > 1): ?>
       <div class="recommendation-others-label">Other Matches</div>
+
+      <div class="score-legend">
+        <strong>Match Score:</strong>
+        <span class="legend-item"><span class="legend-dot" style="background:#e74c3c;"></span>0–49 Low</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#f47c3c;"></span>50–64 Fair</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#f5a623;"></span>65–74 Good</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#8fbe3a;"></span>75–89 Great</span>
+        <span class="legend-item"><span class="legend-dot" style="background:#27ae60;"></span>90–100 Excellent</span>
+      </div>
+
       <div class="recommendation-list">
         <?php foreach ($recommendations as $i => $rec):
           if ($i === 0) continue;
-          $m     = $rec['method'];
-          $score = $rec['score'];
-          $rank  = $i + 1;
-          $catClass   = 'recommendation-cat-' . $m['category'];
-          $catLabel   = ucfirst(str_replace('_', ' ', $m['category']));
-          $icon       = $catIcons[$m['category']] ?? 'fa-circle-dot';
-          $ringDash   = ($score / 100) * $circumference;
-          $bgColors   = [
+          $m        = $rec['method'];
+          $score    = $rec['score'];
+          $rank     = $i + 1;
+          $catClass = 'recommendation-cat-' . $m['category'];
+          $catLabel = ucfirst(str_replace('_', ' ', $m['category']));
+          $icon     = $catIcons[$m['category']] ?? 'fa-circle-dot';
+          $ringDash = ($score / 100) * $circumference;
+          $color    = scoreColor($score);
+          $bgColors = [
             'hormonal'  => 'linear-gradient(135deg,#fce8ef,#fdecea)',
             'barrier'   => 'linear-gradient(135deg,#e4f7f2,#eef5ff)',
             'long_term' => 'linear-gradient(135deg,#eef5ff,#f0eafb)',
@@ -879,10 +651,10 @@ if ($q) {
               <img src="../uploads/contraceptive_methods/<?= htmlspecialchars($m['image_path']) ?>" alt="<?= htmlspecialchars($m['name']) ?>">
             <?php else: ?>
               <div class="recommendation-card-img-placeholder">
-                <div class="recommendation-method-icon-sm" style="background:var(--orange);"><i class="fa-solid <?= $icon ?>"></i></div>
+                <div class="recommendation-method-icon-sm" style="background:<?= $color ?>;"><i class="fa-solid <?= $icon ?>"></i></div>
               </div>
             <?php endif; ?>
-            <div class="recommendation-rank-badge recommendation-rank-<?= $rank ?>"><?= $rank ?></div>
+            <div class="recommendation-rank-badge" style="background:<?= $color ?>;"><?= $rank ?></div>
           </div>
 
           <div class="recommendation-card-body-col">
@@ -909,14 +681,14 @@ if ($q) {
                 <circle class="recommendation-ring-bg" cx="32" cy="32" r="28"/>
                 <circle cx="32" cy="32" r="28"
                   fill="none"
-                  stroke="var(--orange)"
+                  stroke="<?= $color ?>"
                   stroke-width="5"
                   stroke-linecap="round"
                   stroke-dasharray="<?= $circumference ?>"
                   stroke-dashoffset="<?= $circumference - $ringDash ?>"/>
               </svg>
               <div class="recommendation-score-label">
-                <span class="recommendation-score-num-val"><?= $score ?></span>
+                <span class="recommendation-score-num-val" style="color:<?= $color ?>;"><?= $score ?></span>
                 <span class="recommendation-score-num-sub">/100</span>
               </div>
             </div>
@@ -961,22 +733,18 @@ if ($q) {
           <div class="recommendation-modal-section-label">How It Works</div>
           <p id="modalDesc"></p>
         </div>
-
         <div class="recommendation-modal-section" id="modalSideSection" style="display:none;">
           <div class="recommendation-modal-section-label">Side Effects</div>
           <p id="modalSide"></p>
         </div>
-
         <div class="recommendation-modal-section" id="modalHowSection" style="display:none;">
           <div class="recommendation-modal-section-label">How It's Used</div>
           <p id="modalHow"></p>
         </div>
-
         <div class="recommendation-modal-section" id="modalReasonsSection" style="display:none;">
           <div class="recommendation-modal-section-label">Why This Matches You</div>
           <div class="recommendation-modal-reasons" id="modalReasons"></div>
         </div>
-
         <div class="recommendation-modal-disclaimer">
           <i class="fa-solid fa-circle-info" style="margin-top:1px; color:var(--orange); flex-shrink:0;"></i>
           <span>For informational purposes only. Please consult a healthcare provider before choosing a contraceptive method.</span>
@@ -987,33 +755,43 @@ if ($q) {
 </div>
 
 <script>
+function scoreColor(s) {
+  if (s >= 90) return '#27ae60';
+  if (s >= 75) return '#8fbe3a';
+  if (s >= 65) return '#f5a623';
+  if (s >= 50) return '#f47c3c';
+  return '#e74c3c';
+}
+
 const recData = <?= json_encode(array_map(function($rec, $i) use ($catIcons) {
   $m = $rec['method'];
   return [
-    'rank'         => $i + 1,
-    'name'         => $m['name'],
-    'description'  => $m['description'],
-    'side_effects' => $m['side_effects'] ?? '',
-    'how_used'     => $m['how_used'] ?? '',
-    'effectiveness'=> $m['effectiveness'],
-    'cost_level'   => ucfirst($m['cost_level']),
+    'rank'            => $i + 1,
+    'name'            => $m['name'],
+    'description'     => $m['description'],
+    'side_effects'    => $m['side_effects'] ?? '',
+    'how_used'        => $m['how_used']     ?? '',
+    'effectiveness'   => $m['effectiveness'],
+    'cost_level'      => ucfirst($m['cost_level']),
     'is_hormone_free' => (bool)$m['is_hormone_free'],
-    'category'     => $m['category'],
-    'image_path'   => $m['image_path'] ?? '',
-    'score'        => $rec['score'],
-    'reasons'      => $rec['reasons'],
-    'icon'         => $catIcons[$m['category']] ?? 'fa-circle-dot',
+    'category'        => $m['category'],
+    'image_path'      => $m['image_path']   ?? '',
+    'score'           => $rec['score'],
+    'reasons'         => $rec['reasons'],
+    'icon'            => $catIcons[$m['category']] ?? 'fa-circle-dot',
   ];
 }, $recommendations, array_keys($recommendations)), JSON_HEX_TAG) ?>;
 
 function openModal(index) {
-  const d = recData[index];
+  const d   = recData[index];
+  const col = scoreColor(d.score);
+
   document.getElementById('modalName').textContent = d.name;
 
-  const imgEl = document.getElementById('modalImg');
+  const imgEl       = document.getElementById('modalImg');
   const placeholder = document.getElementById('modalImgPlaceholder');
-  const overlay = document.getElementById('modalLeftOverlay');
-  const iconEl = document.getElementById('modalIconEl');
+  const overlay     = document.getElementById('modalLeftOverlay');
+  const iconEl      = document.getElementById('modalIconEl');
 
   if (d.image_path) {
     imgEl.src = '../uploads/contraceptive_methods/' + d.image_path;
@@ -1030,9 +808,10 @@ function openModal(index) {
 
   document.getElementById('modalRankBadge').textContent = d.rank === 1 ? 'Best Match' : 'Match #' + d.rank;
 
-  const pills = document.getElementById('modalPills');
-  pills.innerHTML = `
-    <span class="recommendation-modal-score-pill"><i class="fa-solid fa-star" style="font-size:10px;"></i> ${d.score}/100 Match</span>
+  document.getElementById('modalPills').innerHTML = `
+    <span class="recommendation-modal-score-pill" style="background:${col};box-shadow:0 3px 12px ${col}55;">
+      <i class="fa-solid fa-star" style="font-size:10px;"></i> ${d.score}/100 Match
+    </span>
     <span class="recommendation-modal-eff-pill"><i class="fa-solid fa-shield-check" style="font-size:10px;"></i> ${d.effectiveness}% Effective</span>
     <span class="recommendation-modal-cost-pill"><i class="fa-solid fa-tag" style="font-size:10px;"></i> ${d.cost_level} Cost</span>
     ${d.is_hormone_free ? '<span class="recommendation-modal-hf-pill"><i class="fa-solid fa-leaf" style="font-size:10px;"></i> Hormone-Free</span>' : ''}
@@ -1049,7 +828,7 @@ function openModal(index) {
   else { howSection.style.display = 'none'; }
 
   const reasonsSection = document.getElementById('modalReasonsSection');
-  const reasonsEl = document.getElementById('modalReasons');
+  const reasonsEl      = document.getElementById('modalReasons');
   if (d.reasons && d.reasons.length > 0) {
     reasonsEl.innerHTML = d.reasons.map(r =>
       `<span class="recommendation-modal-reason-chip"><i class="fa-solid fa-check" style="font-size:9px;"></i> ${r}</span>`

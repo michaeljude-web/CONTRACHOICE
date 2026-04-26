@@ -186,14 +186,33 @@ $user_name   = $user_row['username'] ?? $_SESSION['username'] ?? 'User';
       height: 56px;
       background: var(--surface);
       border-bottom: 1.5px solid var(--border);
-      display: flex; align-items: center;
-      padding: 0 28px; flex-shrink: 0;
-      gap: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      flex-shrink: 0;
+      font-size: 13px;
+      color: var(--muted);
       font-family: 'Quicksand', sans-serif;
     }
-    .topbar-title { font-size: 15px; font-weight: 700; color: var(--brown-d); }
-    .topbar-sep   { color: var(--border-md); }
-    .topbar-page  { font-size: 13px; color: var(--muted); font-weight: 600; }
+    .topbar b {
+      color: var(--brown);
+      font-weight: 700;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    .topbar-sep {
+      color: var(--border);
+      font-size: 16px;
+    }
+    .topbar-page {
+      color: var(--muted);
+      font-weight: 500;
+    }
 
     .content-area {
       flex: 1; overflow-y: auto;
@@ -436,9 +455,11 @@ $user_name   = $user_row['username'] ?? $_SESSION['username'] ?? 'User';
 
   <div class="cc-main">
     <div class="topbar">
-      <span class="topbar-title">ContraChoice</span>
-      <span class="topbar-sep">›</span>
-      <span class="topbar-page"><?= htmlspecialchars($page_title) ?></span>
+      <div class="topbar-left">
+        <span><b>ContraChoice</b></span>
+        <span class="topbar-sep">/</span>
+        <span class="topbar-page"><?= htmlspecialchars($page_title) ?></span>
+      </div>
     </div>
 
     <div class="content-area">
@@ -491,7 +512,6 @@ $user_name   = $user_row['username'] ?? $_SESSION['username'] ?? 'User';
 
         <form method="POST" id="q-form">
 
-          <!-- ── STEP 1: Personal ── -->
           <div class="q-panel active" id="panel-1">
             <div class="q-card">
               <div class="q-section-label">Step 1 of 5</div>
@@ -574,7 +594,6 @@ $user_name   = $user_row['username'] ?? $_SESSION['username'] ?? 'User';
             </div>
           </div>
 
-          <!-- ── STEP 2: Health ── -->
           <div class="q-panel" id="panel-2">
             <div class="q-card">
               <div class="q-section-label">Step 2 of 5</div>
@@ -679,7 +698,6 @@ $user_name   = $user_row['username'] ?? $_SESSION['username'] ?? 'User';
             </div>
           </div>
 
-          <!-- ── STEP 3: Family Planning ── -->
           <div class="q-panel" id="panel-3">
             <div class="q-card">
               <div class="q-section-label">Step 3 of 5</div>
@@ -733,7 +751,6 @@ $user_name   = $user_row['username'] ?? $_SESSION['username'] ?? 'User';
             </div>
           </div>
 
-          <!-- ── STEP 4: Preferences ── -->
           <div class="q-panel" id="panel-4">
             <div class="q-card">
               <div class="q-section-label">Step 4 of 5</div>
@@ -796,7 +813,6 @@ $user_name   = $user_row['username'] ?? $_SESSION['username'] ?? 'User';
             </div>
           </div>
 
-          <!-- ── STEP 5: Budget & History ── -->
           <div class="q-panel" id="panel-5">
             <div class="q-card">
               <div class="q-section-label">Step 5 of 5</div>

@@ -498,7 +498,7 @@ function cat_label($cat) {
     <div class="topbar">
       <div class="topbar-left">
         <span><b>ContraChoice</b></span>
-        <span class="topbar-sep">›</span>
+        <span class="topbar-sep">/</span>
         <span class="topbar-page"><?= htmlspecialchars($page_title) ?></span>
       </div>
     </div>
@@ -510,7 +510,7 @@ function cat_label($cat) {
           <?= strtoupper(substr($user_name, 0, 2)) ?>
         </div>
         <div class="welcome-text">
-          <h1><?= $greeting ?>, <?= htmlspecialchars($user_name) ?>! ✿</h1>
+          <h1><?= $greeting ?>, <?= htmlspecialchars($user_name) ?>!</h1>
           <p>
             <?php if ($has_questionnaire): ?>
               Last assessment: <?= $q_date ?>. You have <?= $total_rec ?> recommendation<?= $total_rec != 1 ? 's' : '' ?> waiting for you~

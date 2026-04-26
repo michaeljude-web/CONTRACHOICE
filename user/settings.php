@@ -91,7 +91,6 @@ if (isset($_POST['action']) && $_POST['action'] === 'change_password') {
 
 $current_avatar = $_SESSION['avatar'] ?? '🌸';
 
-// Determine which accordion to auto-open after submit
 $open_panel = 'none';
 if ($success || $error) {
     $action = $_POST['action'] ?? '';
@@ -107,105 +106,214 @@ if ($success || $error) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($page_title) ?> — ContraChoice</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/vendor/bootstrap-5/css/bootstrap.min.css">
   <link rel="stylesheet" href="../assets/vendor/fontawesome-7/css/all.min.css">
   <style>
     :root {
-      --bg: #f8f6f0;
-      --surface: #ffffff;
-      --border: #e8e4dc;
-      --text: #2c2b28;
-      --muted: #6b6b67;
-      --blue-50: #e8f1fb;
-      --blue-100: #b5d4f4;
-      --blue-600: #185FA5;
-      --blue-800: #0C447C;
+      --bg:         #f5f0e8;
+      --surface:    #fdfaf5;
+      --surface-2:  #faf6ef;
+      --border:     #e8dfd0;
+      --text:       #4a3728;
+      --muted:      #9b8776;
+      --accent-blue:   #b8cfe8;
+      --accent-blue-d: #6b9ab8;
+      --accent-pink:   #f0d5d5;
+      --accent-pink-d: #c47a7a;
+      --accent-mint:   #cce8dc;
+      --accent-mint-d: #5a9a7a;
+      --accent-peach:  #f5ddd0;
+      --accent-peach-d:#c47a55;
+      --accent-lav:    #ddd5f0;
+      --accent-lav-d:  #7a6ab8;
+      --brown:      #7d5a4a;
+      --brown-d:    #5a3a2a;
+      --radius-sm:  12px;
+      --radius-md:  18px;
+      --radius-lg:  24px;
+      --shadow-sm:  0 2px 8px rgba(120,80,50,.08);
+      --shadow-md:  0 4px 16px rgba(120,80,50,.12);
     }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); font-family: 'Outfit', sans-serif; color: var(--text); }
+    body {
+      background: var(--bg);
+      font-family: 'Nunito', sans-serif;
+      color: var(--text);
+      background-image:
+        radial-gradient(circle at 15% 20%, rgba(184,207,232,.18) 0%, transparent 50%),
+        radial-gradient(circle at 85% 75%, rgba(204,232,220,.15) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(240,213,213,.10) 0%, transparent 60%);
+    }
 
     .layout { display: flex; height: 100vh; overflow: hidden; }
-    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+    .main   { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
 
     .topbar {
-      height: 52px; background: var(--surface);
-      border-bottom: 0.5px solid var(--border);
-      display: flex; align-items: center;
-      padding: 0 28px; flex-shrink: 0;
-      font-size: 13px; color: var(--muted);
+      height: 56px;
+      background: var(--surface);
+      border-bottom: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 28px;
+      flex-shrink: 0;
+      font-size: 13px;
+      color: var(--muted);
+      font-family: 'Quicksand', sans-serif;
     }
-    .topbar b { color: var(--text); font-weight: 500; }
+    .topbar b {
+      color: var(--brown);
+      font-weight: 700;
+    }
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+    .topbar-sep {
+      color: var(--border);
+      font-size: 16px;
+    }
+    .topbar-page {
+      color: var(--muted);
+      font-weight: 500;
+    }
 
-    .page-body { flex: 1; overflow-y: auto; padding: 28px 32px; }
-    .page-body::-webkit-scrollbar { width: 4px; }
-    .page-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .page-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 32px;
+    }
+    .page-body::-webkit-scrollbar {
+      width: 5px;
+    }
+    .page-body::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 10px;
+    }
 
-    .page-header { margin-bottom: 24px; }
+    .page-header {
+      margin-bottom: 24px;
+    }
     .page-header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: 22px; font-weight: 500; margin-bottom: 4px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--brown-d);
+      margin-bottom: 4px;
     }
-    .page-header p { font-size: 13px; color: var(--muted); }
+    .page-header p {
+      font-size: 13px;
+      color: var(--muted);
+    }
 
     .alert {
-      border-radius: 14px; padding: 11px 16px;
-      font-size: 13px; margin-bottom: 22px;
-      display: flex; align-items: center; gap: 9px;
+      border-radius: 16px;
+      padding: 12px 18px;
+      font-size: 13px;
+      margin-bottom: 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
     }
-    .alert-success { background: #eaf3de; color: #27500a; }
-    .alert-danger  { background: #fcebeb; color: #791f1f; }
+    .alert-success {
+      background: var(--accent-mint);
+      color: var(--accent-mint-d);
+      border: 1.5px solid #b0d8c4;
+    }
+    .alert-danger {
+      background: var(--accent-pink);
+      color: var(--accent-pink-d);
+      border: 1.5px solid #dfc0c0;
+    }
 
-    /* ── ACCORDION ──────────────────────────── */
-    .accordion { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+    .accordion {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
 
     .acc-item {
       background: var(--surface);
-      border: 0.5px solid var(--border);
-      border-radius: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 20px;
       overflow: hidden;
     }
 
     .acc-trigger {
-      width: 100%; background: none; border: none;
-      display: flex; align-items: center; gap: 14px;
-      padding: 16px 20px;
+      width: 100%;
+      background: none;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 18px 22px;
       cursor: pointer;
       text-align: left;
-      transition: background .15s;
+      transition: background 0.15s;
     }
-    .acc-trigger:hover { background: var(--bg); }
+    .acc-trigger:hover {
+      background: var(--surface-2);
+    }
 
     .acc-icon {
-      width: 36px; height: 36px; border-radius: 10px;
-      background: var(--blue-50);
-      display: flex; align-items: center; justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
       flex-shrink: 0;
     }
-    .acc-icon i { font-size: 15px; color: var(--blue-600); }
+    .acc-icon i {
+      font-size: 18px;
+      color: var(--accent-blue-d);
+    }
 
-    .acc-label { flex: 1; }
-    .acc-label h3 { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 2px; }
-    .acc-label p  { font-size: 12px; color: var(--muted); }
+    .acc-label {
+      flex: 1;
+    }
+    .acc-label h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--brown-d);
+      margin-bottom: 3px;
+    }
+    .acc-label p {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
 
     .acc-arrow {
-      font-size: 12px; color: var(--muted);
-      transition: transform .25s;
+      font-size: 14px;
+      color: var(--muted);
+      transition: transform 0.25s;
       flex-shrink: 0;
     }
-    .acc-item.open .acc-arrow { transform: rotate(90deg); }
+    .acc-item.open .acc-arrow {
+      transform: rotate(90deg);
+    }
 
     .acc-body {
       max-height: 0;
       overflow: hidden;
-      transition: max-height .3s ease;
+      transition: max-height 0.35s ease;
     }
-    .acc-item.open .acc-body { max-height: 800px; }
+    .acc-item.open .acc-body {
+      max-height: 800px;
+    }
 
     .acc-inner {
-      padding: 0 20px 20px;
-      border-top: 0.5px solid var(--border);
-      padding-top: 18px;
+      padding: 0 22px 22px;
+      border-top: 1.5px solid var(--border);
+      padding-top: 20px;
     }
 
     .avatar-scroll {
@@ -213,108 +321,186 @@ if ($success || $error) {
       overflow-y: auto;
       padding-right: 4px;
     }
-    .avatar-scroll::-webkit-scrollbar { width: 4px; }
-    .avatar-scroll::-webkit-scrollbar-track { background: transparent; }
-    .avatar-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    .avatar-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .avatar-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .avatar-scroll::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
 
-    /* ── FORM FIELDS ────────────────────────── */
-    .field { margin-bottom: 14px; }
-    .field:last-of-type { margin-bottom: 0; }
+    .field {
+      margin-bottom: 16px;
+    }
+    .field:last-of-type {
+      margin-bottom: 0;
+    }
     .field label {
-      display: block; font-size: 12px; font-weight: 500;
-      color: var(--muted); margin-bottom: 6px;
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--brown);
+      margin-bottom: 6px;
     }
     .field input {
       width: 100%;
-      border: 0.5px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 13.5px; color: var(--text);
-      background: var(--bg);
-      transition: border-color .18s, background .18s;
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 10px 16px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color 0.18s;
     }
-    .field input:focus { outline: none; border-color: var(--blue-600); background: var(--surface); }
-    .field input:disabled { opacity: .55; cursor: not-allowed; }
-    .field input::placeholder { color: var(--muted); opacity: .6; }
+    .field input:focus {
+      outline: none;
+      border-color: var(--brown);
+    }
+    .field input:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
 
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
 
     .btn-save {
-      background: var(--blue-600); color: #fff;
-      border: none; border-radius: 12px;
-      padding: 10px 20px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 13px; font-weight: 500;
+      background: var(--brown);
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 24px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
       cursor: pointer;
-      display: inline-flex; align-items: center; gap: 7px;
-      margin-top: 16px;
-      transition: background .18s, transform .1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      transition: background 0.18s, transform 0.1s;
+      box-shadow: 0 3px 10px rgba(125,90,74,.3);
     }
-    .btn-save:hover { background: var(--blue-800); }
-    .btn-save:active { transform: scale(.97); }
+    .btn-save:hover {
+      background: var(--brown-d);
+      transform: translateY(-1px);
+    }
+    .btn-save:active {
+      transform: scale(0.97);
+    }
 
-    /* password strength */
-    .strength-bar { height: 3px; border-radius: 3px; background: var(--border); margin-top: 7px; overflow: hidden; }
-    .strength-fill { height: 100%; border-radius: 3px; width: 0; transition: width .3s, background .3s; }
-    .strength-label { font-size: 11px; color: var(--muted); margin-top: 4px; min-height: 16px; }
+    .strength-bar {
+      height: 4px;
+      border-radius: 4px;
+      background: var(--border);
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      border-radius: 4px;
+      width: 0;
+      transition: width 0.3s, background 0.3s;
+    }
+    .strength-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 5px;
+      font-weight: 600;
+    }
 
-    /* ── AVATAR PICKER ──────────────────────── */
     .avatar-group-label {
-      font-size: 11px; color: var(--muted); font-weight: 500;
-      margin: 12px 0 7px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--brown);
+      margin: 14px 0 8px;
     }
-    .avatar-group-label:first-child { margin-top: 0; }
+    .avatar-group-label:first-child {
+      margin-top: 0;
+    }
 
     .avatar-grid {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
-      gap: 8px;
+      gap: 10px;
     }
 
     .avatar-opt {
-      aspect-ratio: 1; border-radius: 12px;
+      aspect-ratio: 1;
+      border-radius: 14px;
       border: 2px solid var(--border);
-      background: var(--bg);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 22px; cursor: pointer;
-      transition: border-color .15s, background .15s, transform .12s;
-      line-height: 1;
+      background: var(--surface-2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
     }
-    .avatar-opt:hover { border-color: var(--blue-100); background: var(--blue-50); transform: scale(1.1); }
+    .avatar-opt:hover {
+      border-color: var(--brown);
+      background: var(--surface);
+      transform: scale(1.08);
+    }
     .avatar-opt.selected {
-      border-color: var(--blue-600); background: var(--blue-50);
-      box-shadow: 0 0 0 3px rgba(24,95,165,.15);
+      border-color: var(--brown);
+      background: var(--accent-peach);
+      box-shadow: 0 0 0 3px rgba(125,90,74,0.2);
     }
 
-    /* ── PROFILE CARD (bottom) ──────────────── */
     .profile-card {
       background: var(--surface);
-      border: 0.5px solid var(--border);
-      border-radius: 20px;
-      padding: 28px 24px;
-      display: flex; align-items: center; gap: 20px;
+      border: 1.5px solid var(--border);
+      border-radius: 24px;
+      padding: 28px 28px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
     }
 
     .profile-avatar {
-      width: 72px; height: 72px; border-radius: 50%;
-      background: var(--blue-50);
-      border: 2px solid var(--blue-100);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 34px; line-height: 1; flex-shrink: 0;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: var(--accent-blue);
+      border: 3px solid var(--accent-blue-d);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
+      flex-shrink: 0;
+      box-shadow: 0 3px 10px rgba(107,154,184,0.3);
     }
 
     .profile-info h2 {
-      font-family: 'Playfair Display', serif;
-      font-size: 18px; font-weight: 500; margin-bottom: 4px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--brown-d);
+      margin-bottom: 6px;
     }
-    .profile-info p { font-size: 12px; color: var(--muted); }
+    .profile-info p {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 500;
+    }
 
     .profile-badge {
       margin-left: auto;
-      background: var(--blue-50); color: var(--blue-800);
-      font-size: 11px; padding: 4px 14px;
-      border-radius: 30px; border: 0.5px solid var(--blue-100);
+      background: var(--surface-2);
+      color: var(--brown);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 18px;
+      border-radius: 30px;
+      border: 1.5px solid var(--border);
       flex-shrink: 0;
     }
   </style>
@@ -325,7 +511,11 @@ if ($success || $error) {
 
   <div class="main">
     <div class="topbar">
-      ContraChoice &rsaquo; <b>&nbsp;Account Settings</b>
+      <div class="topbar-left">
+        <span><b>ContraChoice</b></span>
+        <span class="topbar-sep">/</span>
+        <span class="topbar-page"><?= htmlspecialchars($page_title) ?></span>
+      </div>
     </div>
 
     <div class="page-body">
@@ -341,20 +531,17 @@ if ($success || $error) {
         <p>Manage your avatar, username, and password.</p>
       </div>
 
-      <!-- ACCORDION -->
       <div class="accordion">
 
-      <!-- PROFILE CARD at the bottom -->
-      <div class="profile-card">
-        <div class="profile-avatar" id="previewAvatar"><?= htmlspecialchars($current_avatar) ?></div>
-        <div class="profile-info">
-          <h2 id="previewName"><?= htmlspecialchars($user['username']) ?></h2>
-          <p>ContraChoice Member</p>
+        <div class="profile-card">
+          <div class="profile-avatar" id="previewAvatar"><?= htmlspecialchars($current_avatar) ?></div>
+          <div class="profile-info">
+            <h2 id="previewName"><?= htmlspecialchars($user['username']) ?></h2>
+            <p>ContraChoice Member</p>
+          </div>
+          <div class="profile-badge"><i class="fas fa-user" style="font-size:10px;margin-right:5px;"></i> User</div>
         </div>
-        <div class="profile-badge"><i class="fas fa-user" style="font-size:10px;margin-right:4px;"></i> User</div>
-      </div>
 
-        <!-- 1. Choose Avatar -->
         <div class="acc-item <?= $open_panel === 'avatar' ? 'open' : '' ?>" id="acc-avatar">
           <button class="acc-trigger" onclick="toggle('acc-avatar')" type="button">
             <div class="acc-icon"><i class="fas fa-face-smile"></i></div>
@@ -400,7 +587,6 @@ if ($success || $error) {
           </div>
         </div>
 
-        <!-- 2. Change Username -->
         <div class="acc-item <?= $open_panel === 'username' ? 'open' : '' ?>" id="acc-username">
           <button class="acc-trigger" onclick="toggle('acc-username')" type="button">
             <div class="acc-icon"><i class="fas fa-user-pen"></i></div>
@@ -434,7 +620,6 @@ if ($success || $error) {
           </div>
         </div>
 
-        <!-- 3. Change Password -->
         <div class="acc-item <?= $open_panel === 'password' ? 'open' : '' ?>" id="acc-password">
           <button class="acc-trigger" onclick="toggle('acc-password')" type="button">
             <div class="acc-icon"><i class="fas fa-lock"></i></div>
@@ -473,9 +658,6 @@ if ($success || $error) {
         </div>
 
       </div>
-      <!-- end accordion -->
-
-      
 
     </div>
   </div>
