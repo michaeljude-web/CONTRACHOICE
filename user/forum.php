@@ -534,5 +534,6 @@ function resetStars(form, userRated) {
   btns.forEach((b, i) => b.style.color = i < userRated ? '#f0a500' : '#d1cfc6');
 }
 </script>
+<?php include '../includes/user/chatbot_widget.php'; ?>
 </body>
 </html>

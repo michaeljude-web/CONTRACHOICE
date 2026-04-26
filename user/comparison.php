@@ -499,4 +499,5 @@ document.getElementById('compare-modal-overlay').addEventListener('click', funct
 });
 </script>
 </body>
+<?php include '../includes/user/chatbot_widget.php'; ?>
 </html>

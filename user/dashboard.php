@@ -748,5 +748,6 @@ function cat_label($cat) {
     </div>
   </div>
 </div>
+<?php include '../includes/user/chatbot_widget.php'; ?>
 </body>
 </html>

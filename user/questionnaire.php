@@ -972,5 +972,6 @@ document.querySelectorAll('#health-grid .opt-check').forEach(el => {
   });
 });
 </script>
+<?php include '../includes/user/chatbot_widget.php'; ?>
 </body>
 </html>

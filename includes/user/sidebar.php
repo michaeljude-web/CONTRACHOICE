@@ -21,7 +21,7 @@ $user_nav = [
   ['id' => 'recommendations', 'label' => 'My recommendations', 'icon' => 'star',        'color' => 'mauve'],
   ['section' => 'Community'],
   ['id' => 'forum',           'label' => 'Anonymous forum',    'icon' => 'chat',        'color' => 'sky'],
-  ['id' => 'chatbot',         'label' => 'AI chatbot',         'icon' => 'bot',         'color' => 'sage'],
+  // ['id' => 'chatbot',         'label' => 'AI chatbot',         'icon' => 'bot',         'color' => 'sage'],
   ['section' => 'Account'],
   ['id' => 'settings',        'label' => 'Settings',           'icon' => 'settings',    'color' => 'neutral'],
 ];

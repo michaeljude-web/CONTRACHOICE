@@ -1071,5 +1071,6 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 <?php endif; ?>
 
 <script src="../assets/vendor/bootstrap-5/js/bootstrap.bundle.min.js"></script>
+<?php include '../includes/user/chatbot_widget.php'; ?>
 </body>
 </html>
