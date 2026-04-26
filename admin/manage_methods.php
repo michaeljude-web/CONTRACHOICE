@@ -135,7 +135,7 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Manage Contraceptive Methods</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/vendor/bootstrap-5/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/vendor/fontawesome-7/css/all.min.css">
     <style>
@@ -151,7 +151,7 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
         }
         body { 
             background: var(--bg-dirty); 
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Nunito', sans-serif;
             margin: 0;
             padding: 0;
         }
@@ -177,6 +177,7 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
         .topbar-left h4 {
             margin: 0;
             font-weight: 500;
+            font-family: 'Quicksand', sans-serif;
         }
         .topbar-left p {
             margin: 0;
@@ -192,10 +193,11 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
             gap: 16px;
         }
         .admin-header h1 {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Quicksand', sans-serif;
             font-size: 26px;
-            font-weight: 500;
+            font-weight: 700;
             margin: 0;
+            color: var(--text-primary);
         }
         .btn-add {
             background: var(--blue-600);
@@ -204,6 +206,7 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
             padding: 10px 20px;
             color: white;
             font-weight: 500;
+            font-family: 'Nunito', sans-serif;
         }
         .card-method {
             background: var(--surface);
@@ -247,12 +250,19 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
             font-size: 20px;
             flex-shrink: 0;
         }
-        .card-header h3 { margin: 0; font-size: 18px; font-weight: 500; }
+        .card-header h3 { 
+            margin: 0; 
+            font-size: 18px; 
+            font-weight: 600; 
+            font-family: 'Quicksand', sans-serif;
+        }
         .btn-edit, .btn-delete {
             background: none;
             border: none;
             margin-left: 10px;
             cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 500;
         }
         .btn-edit { color: var(--blue-600); }
         .btn-delete { color: var(--red-600); }
@@ -263,7 +273,7 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
             gap: 12px;
         }
         .info-row { font-size: 13px; }
-        .info-label { font-weight: 500; color: var(--text-secondary); width: 130px; display: inline-block; }
+        .info-label { font-weight: 600; color: var(--text-secondary); width: 130px; display: inline-block; }
         .modal-custom .modal-content { border-radius: 20px; }
         .alert-custom { padding: 12px 18px; border-radius: 14px; margin-bottom: 20px; }
         .img-upload-preview {
@@ -272,7 +282,6 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
             object-fit: cover;
             border-radius: 12px;
             border: 1px solid var(--border-soft);
-            display: none;
             margin-top: 8px;
         }
         .img-upload-placeholder {
@@ -288,6 +297,32 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
             font-size: 28px;
             margin-top: 8px;
             cursor: pointer;
+        }
+        .change-photo-btn {
+            background: var(--blue-600);
+            border: none;
+            border-radius: 20px;
+            padding: 4px 12px;
+            color: white;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 8px;
+            display: inline-block;
+        }
+        .current-image-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+        .form-label {
+            font-weight: 600;
+            font-family: 'Nunito', sans-serif;
+        }
+        .btn-primary, .btn-secondary {
+            font-family: 'Nunito', sans-serif;
+            font-weight: 500;
         }
         @media (max-width: 768px) {
             .main-content { margin-left: 0; padding: 16px; }
@@ -356,7 +391,7 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content" style="max-height:92vh; display:flex; flex-direction:column;">
             <div class="modal-header" style="flex-shrink:0;">
-                <h5 class="modal-title" id="modalTitle">Add New Contraceptive Method</h5>
+                <h5 class="modal-title" id="modalTitle" style="font-family: 'Quicksand', sans-serif;">Add New Contraceptive Method</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form method="POST" id="methodForm" enctype="multipart/form-data" style="display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden;">
@@ -367,14 +402,16 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
 
                         <div class="col-12">
                             <label class="form-label">Method Photo</label>
-                            <div>
+                            <div id="imageUploadArea">
                                 <div class="img-upload-placeholder" id="imgPlaceholder" onclick="document.getElementById('method_image').click()">
                                     <i class="fas fa-camera"></i>
                                 </div>
-                                <img id="imgPreview" class="img-upload-preview" alt="Preview">
+                                <div id="currentImagePreview" style="display:none;" class="current-image-container">
+                                    <img id="imgPreview" class="img-upload-preview" alt="Current Photo">
+                                    <button type="button" class="change-photo-btn" onclick="triggerFileInput()"><i class="fas fa-sync-alt"></i> Change Photo</button>
+                                </div>
                             </div>
                             <input type="file" name="method_image" id="method_image" accept="image/*" class="d-none">
-                            <div class="form-text">Any image format (JPG, PNG, GIF, WEBP, BMP...). Leave blank to keep existing photo.</div>
                         </div>
 
                         <div class="col-md-6">
@@ -479,30 +516,41 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
     const imgInput = document.getElementById('method_image');
     const imgPreview = document.getElementById('imgPreview');
     const imgPlaceholder = document.getElementById('imgPlaceholder');
+    const currentImagePreviewDiv = document.getElementById('currentImagePreview');
+    let isEditMode = false;
 
     imgInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
             const reader = new FileReader();
             reader.onload = e => {
                 imgPreview.src = e.target.result;
-                imgPreview.style.display = 'block';
                 imgPlaceholder.style.display = 'none';
+                currentImagePreviewDiv.style.display = 'flex';
             };
             reader.readAsDataURL(this.files[0]);
+        } else if (!isEditMode) {
+            imgPlaceholder.style.display = 'flex';
+            currentImagePreviewDiv.style.display = 'none';
         }
     });
 
+    function triggerFileInput() {
+        document.getElementById('method_image').click();
+    }
+
     function resetForm() {
+        isEditMode = false;
         document.getElementById('formAction').value = 'add';
         document.getElementById('modalTitle').innerText = 'Add New Contraceptive Method';
         document.getElementById('methodForm').reset();
         document.getElementById('method_id').value = '';
-        imgPreview.style.display = 'none';
         imgPreview.src = '';
         imgPlaceholder.style.display = 'flex';
+        currentImagePreviewDiv.style.display = 'none';
     }
 
     function editMethod(method) {
+        isEditMode = true;
         document.getElementById('formAction').value = 'edit';
         document.getElementById('modalTitle').innerText = 'Edit Method';
         document.getElementById('method_id').value = method.method_id;
@@ -522,12 +570,12 @@ $methods = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id"
 
         if (method.image_path) {
             imgPreview.src = '../uploads/contraceptive_methods/' + method.image_path;
-            imgPreview.style.display = 'block';
             imgPlaceholder.style.display = 'none';
+            currentImagePreviewDiv.style.display = 'flex';
         } else {
-            imgPreview.style.display = 'none';
             imgPreview.src = '';
             imgPlaceholder.style.display = 'flex';
+            currentImagePreviewDiv.style.display = 'none';
         }
 
         new bootstrap.Modal(document.getElementById('methodModal')).show();
