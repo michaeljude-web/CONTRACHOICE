@@ -222,14 +222,43 @@ while ($row = $result->fetch_assoc()) {
         <button class="compare-bar-clear" onclick="clearSelection()">✕</button>
       </div>
       <div class="methods-grid" id="methods-grid">
-        <?php foreach ($methods as $i => $m):
-          $eff = floatval($m['effectiveness']);
-          $eff_color = $eff >= 99 ? '#0F6E56' : ($eff >= 95 ? '#185FA5' : '#854F0B');
-          $category = strtolower($m['category']);
-          $type_labels = ['hormonal' => 'Hormonal', 'barrier' => 'Barrier', 'long_term' => 'Long-acting', 'natural' => 'Natural', 'emergency' => 'Emergency'];
-          $type_colors = ['hormonal' => 'green', 'barrier' => 'amber', 'long_term' => 'blue', 'natural' => 'teal', 'emergency' => 'purple'];
-          $type_label = $type_labels[$category] ?? ucfirst($category);
+        <?php
+        $category_labels  = [
+          'hormonal'  => 'Hormonal',
+          'barrier'   => 'Barrier',
+          'long_term' => 'Long-acting',
+          'natural'   => 'Natural',
+          'emergency' => 'Emergency',
+        ];
+        $delivery_labels  = [
+          'daily_pill'        => 'Daily Pill',
+          'weekly_patch'      => 'Weekly Patch',
+          'monthly_injection' => 'Monthly Injection',
+          'long_term'         => 'Long-acting Device',
+          'barrier'           => 'Barrier Method',
+          'natural'           => 'Natural Method',
+        ];
+        $cost_labels = [
+          'low'    => 'Low',
+          'medium' => 'Medium',
+          'high'   => 'High',
+        ];
+        $type_colors = [
+          'hormonal'  => 'green',
+          'barrier'   => 'amber',
+          'long_term' => 'blue',
+          'natural'   => 'teal',
+          'emergency' => 'purple',
+        ];
+
+        foreach ($methods as $i => $m):
+          $eff        = floatval($m['effectiveness']);
+          $eff_color  = $eff >= 99 ? '#0F6E56' : ($eff >= 95 ? '#185FA5' : '#854F0B');
+          $category   = strtolower($m['category']);
+          $type_label = $category_labels[$category] ?? ucfirst($category);
           $type_color = $type_colors[$category] ?? 'blue';
+          $del_label  = $delivery_labels[$m['delivery']] ?? ucfirst(str_replace('_', ' ', $m['delivery']));
+          $cost_label = $cost_labels[$m['cost_level']] ?? ucfirst($m['cost_level']);
         ?>
         <div class="method-card" id="card-<?= $i ?>"
              data-index="<?= $i ?>"
@@ -273,11 +302,11 @@ while ($row = $result->fetch_assoc()) {
           <div class="info-grid">
             <div class="info-item">
               <div class="info-item-label">Delivery</div>
-              <div class="info-item-val"><?= htmlspecialchars($m['delivery']) ?></div>
+              <div class="info-item-val"><?= htmlspecialchars($del_label) ?></div>
             </div>
             <div class="info-item">
               <div class="info-item-label">Cost</div>
-              <div class="info-item-val"><?= str_repeat('₱', $m['cost_level'] === 'low' ? 1 : ($m['cost_level'] === 'medium' ? 2 : 3)) ?></div>
+              <div class="info-item-val"><?= htmlspecialchars($cost_label) ?></div>
             </div>
             <div class="info-item">
               <div class="info-item-label">Hormonal</div>
@@ -343,6 +372,30 @@ while ($row = $result->fetch_assoc()) {
 
 <script>
 const METHODS = <?= json_encode($methods, JSON_UNESCAPED_UNICODE) ?>;
+
+const CATEGORY_LABELS = {
+  hormonal:  'Hormonal',
+  barrier:   'Barrier',
+  long_term: 'Long-acting',
+  natural:   'Natural',
+  emergency: 'Emergency'
+};
+
+const DELIVERY_LABELS = {
+  daily_pill:        'Daily Pill',
+  weekly_patch:      'Weekly Patch',
+  monthly_injection: 'Monthly Injection',
+  long_term:         'Long-acting Device',
+  barrier:           'Barrier Method',
+  natural:           'Natural Method'
+};
+
+const COST_LABELS = {
+  low:    'Low',
+  medium: 'Medium',
+  high:   'High'
+};
+
 let selected = [];
 const MAX_SELECT = 3;
 
@@ -386,9 +439,9 @@ function filterMethods(filter, btn) {
     const cat      = card.dataset.category;
     const hormonal = card.dataset.hormonal;
     let show = false;
-    if (filter === 'all')           show = true;
+    if (filter === 'all')               show = true;
     else if (filter === 'non-hormonal') show = hormonal === 'false';
-    else                            show = cat === filter;
+    else                                show = cat === filter;
     card.classList.toggle('hidden', !show);
   });
 }
@@ -405,28 +458,24 @@ function toggleExpand(i) {
 
 function openCompareModal() {
   const cols = selected.map(i => METHODS[i]);
-  const costSymbol = m => {
-    const map = {low: '₱', medium: '₱₱', high: '₱₱₱'};
-    return map[m.cost_level] || m.cost_level;
-  };
   const effColor = e => e >= 99 ? '#0F6E56' : e >= 95 ? '#185FA5' : '#854F0B';
 
   const rows = [
-    { label: 'Photo',         fn: m => m.image_path
+    { label: 'Photo', fn: m => m.image_path
         ? `<img src="../uploads/contraceptive_methods/${m.image_path}" class="compare-img" alt="${m.name}">`
         : `<div class="compare-img-placeholder">💊</div>` },
-    { label: 'Category',      fn: m => m.category },
+    { label: 'Category',      fn: m => CATEGORY_LABELS[m.category]  || m.category },
     { label: 'Effectiveness', fn: m => `<div class="eff-row" style="gap:8px;">
         <div class="eff-track"><div class="eff-fill" style="width:${m.effectiveness}%;background:${effColor(m.effectiveness)};"></div></div>
         <span style="font-size:12px;font-weight:500;flex-shrink:0;">${m.effectiveness}%</span></div>` },
-    { label: 'Delivery',      fn: m => m.delivery },
-    { label: 'Cost',          fn: m => costSymbol(m) },
-    { label: 'Hormonal',      fn: m => m.is_hormone_free ? '<span class="pill-no">No</span>' : '<span class="pill-yes">Yes</span>' },
-    { label: 'Smoker-safe',   fn: m => m.suitable_smoker == 1 ? '<span class="pill-yes">Yes</span>' : '<span class="pill-no">No</span>' },
+    { label: 'Delivery',      fn: m => DELIVERY_LABELS[m.delivery]  || m.delivery },
+    { label: 'Cost',          fn: m => COST_LABELS[m.cost_level]    || m.cost_level },
+    { label: 'Hormonal',      fn: m => m.is_hormone_free == 1 ? '<span class="pill-no">No</span>'  : '<span class="pill-yes">Yes</span>' },
+    { label: 'Smoker-safe',   fn: m => m.suitable_smoker == 1      ? '<span class="pill-yes">Yes</span>' : '<span class="pill-no">No</span>' },
     { label: 'Breastfeeding', fn: m => m.suitable_breastfeeding == 1 ? '<span class="pill-yes">Yes</span>' : '<span class="pill-no">No</span>' },
-    { label: 'How it works',  fn: m => m.how_used || '—' },
+    { label: 'How it works',  fn: m => m.how_used     || '—' },
     { label: 'Side effects',  fn: m => m.side_effects || '—' },
-    { label: 'Best for',      fn: m => m.best_for || '—' },
+    { label: 'Best for',      fn: m => m.best_for     || '—' },
   ];
 
   let html = '<thead><tr><th></th>';
