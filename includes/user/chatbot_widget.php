@@ -1,21 +1,10 @@
-
-<!-- ══════════════════════════════════════
-     ContraChoice — Floating Chatbot Widget
--->
 <link rel="stylesheet" href="/hci/assets/vendor/fontawesome-7/css/all.min.css">
-<!-- ══════════════════════════════════════
-     ContraChoice — Floating Chatbot Widget
-     Usage: 
-     ══════════════════════════════════════ -->
-
-<!-- Floating Button -->
 <button class="cc-fab" id="ccFab" onclick="ccToggle()" title="Chat with AI">
-  <i class="fas fa-comment-dots cc-fab-icon-open"></i>
+  <i class="fas fa-robot" class="cc-fab-icon-open"></i>
   <i class="fas fa-xmark cc-fab-icon-close" style="display:none;"></i>
   <span class="cc-fab-badge" id="ccBadge">1</span>
 </button>
 
-<!-- Chat Modal -->
 <div class="cc-widget" id="ccWidget">
   <div class="cc-widget-header">
     <div class="cc-widget-header-left">
@@ -54,7 +43,6 @@
 </div>
 
 <style>
-/* ── FAB button */
 .cc-fab {
   position: fixed;
   bottom: 28px;
@@ -73,8 +61,14 @@
   justify-content: center;
   z-index: 9998;
   transition: background 0.18s, transform 0.15s, box-shadow 0.18s;
+  /* animation: ccFloat 20s ease-in-out infinite; */
 }
-.cc-fab:hover { background: #0C447C; transform: scale(1.08); box-shadow: 0 6px 24px rgba(24,95,165,0.55); }
+.cc-fab:hover {
+  background: #0C447C;
+  transform: scale(1.08);
+  box-shadow: 0 6px 24px rgba(24,95,165,0.55);
+  animation: none;
+}
 
 .cc-fab-badge {
   position: absolute;
@@ -93,7 +87,6 @@
 }
 .cc-fab-badge.hidden { display: none; }
 
-/* ── Widget panel */
 .cc-widget {
   position: fixed;
   bottom: 94px;
@@ -117,7 +110,6 @@
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* header */
 .cc-widget-header {
   display: flex;
   align-items: center;
@@ -146,7 +138,6 @@
 }
 .cc-widget-close:hover { background: rgba(255,255,255,0.3); }
 
-/* messages */
 .cc-widget-msgs {
   flex: 1;
   overflow-y: auto;
@@ -185,14 +176,12 @@
 .cc-msg.cc-bot  .cc-bubble { background: #fff; border: 0.5px solid #e8e4dc; border-bottom-left-radius: 4px; }
 .cc-bubble strong { color: #0C447C; }
 
-/* formatted lines */
 .cc-r-line   { margin: 1px 0; }
 .cc-r-bullet { margin: 2px 0 2px 10px; }
 .cc-r-arrow  { margin: 2px 0 2px 14px; color: #185FA5; font-size: 12px; }
 .cc-r-space  { height: 4px; }
 .cc-r-trow   { display: flex; gap: 8px; font-size: 12px; border-bottom: 0.5px solid #eee; padding: 3px 0; }
 
-/* typing */
 .cc-typing-wrap { display: flex; gap: 7px; align-self: flex-start; animation: ccPop .18s ease; }
 .cc-typing-dots {
   display: flex; gap: 4px; align-items: center;
@@ -211,7 +200,6 @@
   30% { opacity:1; transform: translateY(-3px); }
 }
 
-/* chips */
 .cc-widget-chips {
   display: flex; flex-wrap: wrap; gap: 6px;
   padding: 8px 14px;
@@ -232,7 +220,6 @@
 }
 .cc-chip:hover { background: #e8f1fb; border-color: #b5d4f4; color: #0C447C; }
 
-/* input row */
 .cc-widget-input-row {
   display: flex; gap: 8px; align-items: flex-end;
   padding: 10px 14px 14px;
@@ -266,17 +253,20 @@
 .cc-send:hover { background: #0C447C; }
 .cc-send:disabled { background: #ccc; cursor: default; }
 
-/* mobile */
 @media (max-width: 480px) {
   .cc-widget { width: calc(100vw - 24px); right: 12px; bottom: 80px; }
   .cc-fab { right: 16px; bottom: 16px; }
+}
+
+@keyframes ccFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 </style>
 
 <script>
 (function() {
 
-/* ── Knowledge base ── */
 const KB = [
   { kw:['hello','hi','hey','kumusta','musta','kamusta','magandang umaga','magandang hapon','magandang gabi'],
     r:`Hello!\n\nI'm ContraChoice AI. I can answer questions about contraceptives and family planning in **English or Filipino**.\n\nAsk me about: **pills, IUD, implant, injection, condom, emergency contraception, effectiveness, side effects, costs,** and more!` },
