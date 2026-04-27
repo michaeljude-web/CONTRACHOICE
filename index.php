@@ -1,740 +1,570 @@
+<?php
+$methods = [
+    ['method_id'=>1,'name'=>'Combined Oral Contraceptive Pill','category'=>'hormonal','effectiveness'=>91.0,'is_hormone_free'=>0,'cost_level'=>'low','description'=>'A daily pill containing estrogen and progestin that prevents ovulation. Must be taken at the same time each day.','image_path'=>'method_69ee137dee9d45.91497925.png'],
+    ['method_id'=>2,'name'=>'Progestin-Only Pill (Mini-pill)','category'=>'hormonal','effectiveness'=>91.0,'is_hormone_free'=>0,'cost_level'=>'low','description'=>'A daily pill containing only progestin. Safe for smokers and breastfeeding women. Must be taken at the same time every day.','image_path'=>'method_69edf1908b4f21.42911926.png'],
+    ['method_id'=>3,'name'=>'Hormonal IUD (Mirena)','category'=>'long_term','effectiveness'=>99.8,'is_hormone_free'=>0,'cost_level'=>'high','description'=>'A small T-shaped device inserted into the uterus that releases progestin. Provides 5–8 years of protection.','image_path'=>null],
+    ['method_id'=>4,'name'=>'Copper IUD (Non-hormonal)','category'=>'long_term','effectiveness'=>99.2,'is_hormone_free'=>1,'cost_level'=>'high','description'=>'A hormone-free T-shaped copper device inserted into the uterus. Provides up to 10 years of protection.','image_path'=>'method_69ee1f4d251638.28750785.png'],
+    ['method_id'=>5,'name'=>'Injectable Contraceptive (DMPA)','category'=>'hormonal','effectiveness'=>94.0,'is_hormone_free'=>0,'cost_level'=>'low','description'=>'A progestin injection given every 3 months by a healthcare provider. No daily action needed.','image_path'=>'method_69edf0cc553b69.73734967.png'],
+    ['method_id'=>6,'name'=>'Condom','category'=>'barrier','effectiveness'=>85.0,'is_hormone_free'=>1,'cost_level'=>'low','description'=>'A barrier method that physically prevents sperm from reaching the egg. Also protects against STIs.','image_path'=>'method_69edf030321bf2.91001363.jpeg'],
+    ['method_id'=>7,'name'=>'Contraceptive Implant (Implanon)','category'=>'long_term','effectiveness'=>99.9,'is_hormone_free'=>0,'cost_level'=>'high','description'=>'A small rod inserted under the skin of the upper arm that releases progestin. Provides up to 3 years of protection.','image_path'=>null],
+    ['method_id'=>8,'name'=>'Fertility Awareness Method','category'=>'natural','effectiveness'=>76.0,'is_hormone_free'=>1,'cost_level'=>'low','description'=>'Tracking menstrual cycles, basal body temperature, and cervical mucus to identify fertile days.','image_path'=>null],
+    ['method_id'=>9,'name'=>'Diaphragm with Spermicide','category'=>'barrier','effectiveness'=>88.0,'is_hormone_free'=>1,'cost_level'=>'medium','description'=>'A dome-shaped silicone cup inserted to cover the cervix, used with spermicide.','image_path'=>'method_69edfecb6d2919.22545895.png'],
+    ['method_id'=>10,'name'=>'Emergency Contraceptive Pill','category'=>'emergency','effectiveness'=>85.0,'is_hormone_free'=>0,'cost_level'=>'medium','description'=>'A high-dose hormonal pill taken within 72 hours after unprotected sex to prevent pregnancy.','image_path'=>null],
+    ['method_id'=>11,'name'=>'Bilateral Tubal Ligation','category'=>'long_term','effectiveness'=>99.5,'is_hormone_free'=>1,'cost_level'=>'high','description'=>'A permanent surgical procedure that blocks or removes the fallopian tubes.','image_path'=>null],
+];
+$category_labels = ['hormonal'=>'Hormonal','barrier'=>'Barrier','long_term'=>'Long-Term','natural'=>'Natural','emergency'=>'Emergency'];
+$cat_icons = ['hormonal'=>'fa-pills','barrier'=>'fa-shield-halved','long_term'=>'fa-clock','natural'=>'fa-leaf','emergency'=>'fa-bolt'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ContraChoice — Know Your Options</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --ink:        #141210;
-            --ink-soft:   #2a2724;
-            --muted:      #7a756e;
-            --muted-lt:   #b0aba3;
-            --cream:      #f9f7f3;
-            --cream-dark: #f0ece4;
-            --white:      #ffffff;
-            --rose:       #b85c5c;
-            --rose-deep:  #8f3f3f;
-            --rose-pale:  #f3e0e0;
-            --border:     rgba(0,0,0,0.08);
-            --border-md:  rgba(0,0,0,0.13);
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ContraChoice</title>
+<link rel="stylesheet" href="/hci/assets/vendor/fontawesome-7/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
 
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
+:root{
+    --rose:#c0506e;
+    --rose-mid:#d4748e;
+    --rose-soft:#eedde3;
+    --rose-pale:#f8f0f3;
+    --teal:#4a9b8e;
+    --teal-soft:#ddf0ec;
+    --bg:#fdfbfc;
+    --bg2:#f7f3f5;
+    --bg3:#f0eaec;
+    --ink:#111111;
+    --ink2:#333333;
+    --ink3:#666666;
+    --line:#e8dfe3;
+    --r:8px;
+}
 
-        body {
-            font-family: 'Jost', sans-serif;
-            background: var(--cream);
-            color: var(--ink);
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
+body{
+    font-family:'Jost',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    line-height:1.6;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+}
+a{text-decoration:none;color:inherit;}
+img{display:block;width:100%;}
 
-        /* ─── NAV ─── */
-        nav {
-            position: fixed;
-            top: 0; left: 0; right: 0;
-            z-index: 100;
-            padding: 0 56px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(249,247,243,0.92);
-            backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
-        }
+nav{
+    position:fixed;top:0;left:0;right:0;z-index:200;
+    height:64px;
+    background:rgba(253,251,252,0.93);
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 56px;
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+}
+.logo{
+    font-family:'Jost',sans-serif;
+    font-size:21px;font-weight:600;letter-spacing:0.5px;
+    color:#000000;
+}
+.logo span{color:var(--rose);}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none;}
+.nav-links a{
+    font-size:13px;font-weight:400;letter-spacing:0.3px;
+    color:var(--ink2);padding:7px 14px;border-radius:var(--r);
+    transition:all 0.18s;
+}
+.nav-links a:hover{color:var(--rose);background:var(--rose-pale);}
+.nav-links .cta{
+    background:var(--rose);
+    color:#fff!important;
+    font-weight:500!important;
+    font-size:12px!important;
+    letter-spacing:0.8px;
+    text-transform:uppercase;
+    padding:8px 22px!important;
+    border-radius:var(--r);
+    transition:background 0.2s,transform 0.15s;
+}
+.nav-links .cta:hover{background:#a83d5a;transform:translateY(-1px);}
 
-        .nav-brand {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--ink);
-            text-decoration: none;
-            letter-spacing: -0.3px;
-        }
-        .nav-brand em { font-style: italic; color: var(--rose); }
+.hero{
+    position:relative;z-index:10;
+    min-height:100vh;
+    display:flex;flex-direction:column;
+    align-items:center;justify-content:center;
+    text-align:center;
+    padding:120px 48px 80px;
+    overflow:hidden;
+    background:linear-gradient(165deg,#fff 0%,var(--rose-pale) 50%,#fdf6f8 100%);
+}
+.hero-deco{
+    position:absolute;border-radius:50%;
+    pointer-events:none;
+}
+.deco1{
+    width:520px;height:520px;
+    top:-140px;right:-160px;
+    background:radial-gradient(circle,var(--rose-soft) 0%,transparent 70%);
+    opacity:0.5;
+}
+.deco2{
+    width:380px;height:380px;
+    bottom:-100px;left:-120px;
+    background:radial-gradient(circle,var(--teal-soft) 0%,transparent 70%);
+    opacity:0.55;
+}
+.deco3{
+    width:200px;height:200px;
+    top:40%;left:10%;
+    background:radial-gradient(circle,var(--rose-soft) 0%,transparent 70%);
+    opacity:0.3;
+}
 
-        .nav-center {
-            display: flex;
-            align-items: center;
-            gap: 40px;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-        .nav-center a {
-            font-size: 13px;
-            font-weight: 400;
-            letter-spacing: 0.04em;
-            color: var(--muted);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .nav-center a:hover { color: var(--ink); }
+.hero-eyebrow{
+    display:inline-flex;align-items:center;gap:10px;
+    font-size:10px;font-weight:500;letter-spacing:2.8px;
+    text-transform:uppercase;color:var(--rose);
+    margin-bottom:28px;
+}
+.hero-eyebrow::before,.hero-eyebrow::after{
+    content:'';display:block;
+    width:32px;height:1px;background:var(--rose-mid);opacity:0.6;
+}
+.hero-title{
+    font-family:'Playfair Display',serif;
+    font-size:clamp(48px,7.5vw,88px);
+    font-weight:400;line-height:1.04;letter-spacing:-0.5px;
+    color:var(--ink);margin-bottom:8px;
+}
+.hero-title em{font-style:normal;color:var(--rose);}
+.hero-sub{
+    font-family:'Playfair Display',serif;
+    font-size:clamp(22px,3.5vw,42px);
+    font-weight:400;font-style:normal;
+    color:var(--ink2);margin-bottom:24px;line-height:1.25;
+}
+.hero-desc{
+    font-size:15px;font-weight:300;color:var(--ink3);
+    max-width:420px;line-height:1.85;margin-bottom:40px;
+    letter-spacing:0.1px;
+}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
 
-        .btn-signin {
-            font-size: 12.5px;
-            font-weight: 500;
-            letter-spacing: 0.06em;
-            padding: 8px 20px;
-            border: 1px solid var(--ink);
-            border-radius: 2px;
-            color: var(--ink);
-            text-decoration: none;
-            transition: background 0.2s, color 0.2s;
-        }
-        .btn-signin:hover { background: var(--ink); color: var(--white); }
+.btn-primary{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--rose);color:#fff;
+    padding:13px 32px;border-radius:var(--r);
+    font-size:12px;font-weight:500;letter-spacing:1px;
+    text-transform:uppercase;transition:all 0.2s;
+    box-shadow:0 4px 20px rgba(192,80,110,0.22);
+}
+.btn-primary:hover{
+    background:#a83d5a;
+    transform:translateY(-2px);
+    box-shadow:0 8px 28px rgba(192,80,110,0.3);
+}
+.btn-secondary{
+    display:inline-flex;align-items:center;gap:8px;
+    background:transparent;color:var(--ink2);
+    padding:12px 32px;border-radius:var(--r);
+    font-size:12px;font-weight:400;letter-spacing:1px;
+    text-transform:uppercase;border:1.5px solid var(--line);
+    transition:all 0.2s;
+}
+.btn-secondary:hover{border-color:var(--rose-mid);color:var(--rose);background:var(--rose-pale);}
 
-        /* ─── HERO ─── */
-        .hero {
-            min-height: 100vh;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            padding-top: 64px;
-        }
+.hero-stats{
+    display:flex;gap:56px;margin-top:60px;
+    padding-top:36px;border-top:1px solid var(--line);
+}
+.sv{
+    font-family:'Playfair Display',serif;
+    font-size:38px;font-weight:400;color:var(--rose);
+    display:block;line-height:1;
+}
+.sl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink3);margin-top:6px;}
 
-        .hero-left {
-            padding: 80px 64px 80px 56px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            border-right: 1px solid var(--border-md);
-            animation: fadeUp 0.8s ease both;
-        }
+.scroll-hint{
+    position:absolute;bottom:30px;left:50%;transform:translateX(-50%);
+    display:flex;flex-direction:column;align-items:center;gap:8px;
+    font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--ink3);
+    animation:bob 2.2s ease-in-out infinite;
+}
+.scroll-line{width:1px;height:36px;background:linear-gradient(to bottom,var(--rose-mid),transparent);}
+@keyframes bob{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(6px);}}
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(24px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+.sec{position:relative;z-index:10;padding:96px 0;}
+.wrap{max-width:1200px;margin:0 auto;padding:0 56px;}
+.sec-tag{
+    font-size:9.5px;letter-spacing:2.5px;text-transform:uppercase;
+    color:var(--rose);margin-bottom:10px;
+    display:flex;align-items:center;gap:10px;
+}
+.sec-tag::after{content:'';flex:0 0 36px;height:1px;background:var(--rose-mid);opacity:0.5;}
+.sec-title{
+    font-family:'Playfair Display',serif;
+    font-size:clamp(28px,3.8vw,46px);font-weight:400;
+    color:var(--ink);line-height:1.18;letter-spacing:-0.2px;margin-bottom:12px;
+}
+.sec-title em{font-style:normal;color:var(--rose);}
+.sec-sub{font-size:14px;font-weight:300;color:var(--ink3);line-height:1.85;max-width:480px;}
 
-        .hero-kicker {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 36px;
-        }
-        .hero-kicker-line {
-            width: 32px;
-            height: 1px;
-            background: var(--rose);
-        }
-        .hero-kicker span {
-            font-size: 10.5px;
-            font-weight: 500;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--rose);
-        }
+.divider{width:100%;height:1px;background:var(--line);}
 
-        .hero-title {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 62px;
-            font-weight: 700;
-            line-height: 1.05;
-            letter-spacing: -1.5px;
-            color: var(--ink);
-            margin-bottom: 28px;
-        }
-        .hero-title em {
-            font-style: italic;
-            color: var(--rose);
-            font-weight: 400;
-        }
+.sec-how{background:var(--bg);}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);margin-top:52px;}
+.step{
+    padding:40px 36px;
+    border-right:1px solid var(--line);
+    position:relative;transition:background 0.25s;
+}
+.step:last-child{border-right:none;}
+.step:hover{background:var(--rose-pale);}
+.step-n{
+    font-family:'Playfair Display',serif;
+    font-size:56px;font-weight:400;
+    color:var(--rose-soft);line-height:1;margin-bottom:18px;
+}
+.step-t{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:8px;}
+.step-d{font-size:13px;font-weight:300;color:var(--ink3);line-height:1.75;}
 
-        .hero-desc {
-            font-size: 15px;
-            font-weight: 300;
-            color: var(--muted);
-            line-height: 1.8;
-            max-width: 420px;
-            margin-bottom: 48px;
-        }
+.sec-methods{background:var(--bg2);}
+.filter-bar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:32px;}
+.fb{
+    font-size:10.5px;font-weight:400;letter-spacing:0.8px;text-transform:uppercase;
+    padding:7px 18px;border-radius:100px;
+    border:1.5px solid var(--line);
+    background:var(--bg);color:var(--ink3);
+    cursor:pointer;transition:all 0.18s;font-family:'Jost',sans-serif;
+}
+.fb:hover{border-color:var(--rose-mid);color:var(--rose);}
+.fb.on{background:var(--rose);border-color:var(--rose);color:#fff;}
 
-        .hero-actions {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+.mgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;}
+.mc{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:var(--r);
+    display:flex;flex-direction:column;
+    transition:all 0.25s;overflow:hidden;
+}
+.mc:hover{
+    border-color:var(--rose-mid);
+    transform:translateY(-3px);
+    box-shadow:0 8px 32px rgba(192,80,110,0.1);
+}
+.mc.hidden{display:none;}
 
-        .btn-primary {
-            padding: 14px 32px;
-            background: var(--ink);
-            color: var(--white);
-            font-family: 'Jost', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 0.06em;
-            text-decoration: none;
-            border-radius: 2px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: background 0.2s, transform 0.15s;
-        }
-        .btn-primary:hover { background: var(--rose-deep); transform: translateY(-1px); color: var(--white); text-decoration: none; }
+.mc-img{
+    width:100%;aspect-ratio:1/1;
+    overflow:hidden;position:relative;
+    background:var(--rose-pale);flex-shrink:0;
+}
+.mc-img img{
+    width:100%;height:100%;object-fit:cover;
+    transition:transform 0.5s ease;
+}
+.mc:hover .mc-img img{transform:scale(1.05);}
+.mc-placeholder{
+    width:100%;height:100%;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+    color:var(--rose-mid);
+}
+.mc-placeholder i{font-size:26px;opacity:0.35;}
+.mc-placeholder span{font-size:10px;letter-spacing:1px;text-transform:uppercase;opacity:0.4;color:var(--ink3);}
 
-        .btn-text {
-            font-size: 13px;
-            font-weight: 400;
-            color: var(--muted);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: color 0.2s;
-        }
-        .btn-text:hover { color: var(--ink); text-decoration: none; }
+.mc-badge{
+    position:absolute;top:10px;left:10px;
+    font-size:9px;font-weight:500;letter-spacing:1px;text-transform:uppercase;
+    padding:4px 10px;border-radius:100px;
+    background:rgba(253,251,252,0.92);color:var(--rose);
+    border:1px solid var(--rose-soft);
+}
 
-        .hero-right {
-            background: var(--cream-dark);
-            display: flex;
-            flex-direction: column;
-            animation: fadeUp 0.8s 0.12s ease both;
-        }
+.mc-body{padding:16px 18px;flex:1;display:flex;flex-direction:column;gap:8px;}
+.mc-name{font-size:13px;font-weight:500;color:var(--ink);line-height:1.4;}
+.mc-desc{
+    font-size:12px;font-weight:300;color:var(--ink3);line-height:1.7;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+    flex:1;
+}
+.mc-foot{
+    display:flex;align-items:center;justify-content:space-between;
+    padding-top:10px;border-top:1px solid var(--line);margin-top:auto;
+}
+.mc-eff{
+    font-family:'Playfair Display',serif;
+    font-size:18px;font-weight:400;color:var(--rose);line-height:1;
+}
+.mc-eff span{font-size:10px;font-weight:300;color:var(--ink3);font-family:'Jost',sans-serif;}
+.mc-tags{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;}
+.tag{
+    font-size:9px;font-weight:500;letter-spacing:0.6px;text-transform:uppercase;
+    padding:3px 8px;border-radius:100px;
+}
+.t-hf{background:var(--teal-soft);color:var(--teal);border:1px solid rgba(74,155,142,0.25);}
+.t-low{background:var(--bg2);color:var(--ink3);border:1px solid var(--line);}
+.t-med{background:var(--rose-pale);color:var(--rose);border:1px solid var(--rose-soft);}
+.t-high{background:var(--bg3);color:var(--ink3);border:1px solid var(--line);}
 
-        .hero-stat-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            height: 100%;
-        }
+.sec-cta{
+    background:linear-gradient(150deg,var(--rose-pale) 0%,#fff 60%,var(--teal-soft) 100%);
+    padding:110px 48px;text-align:center;position:relative;overflow:hidden;
+}
+.cta-line{width:1px;height:56px;margin:0 auto 28px;background:linear-gradient(to bottom,transparent,var(--rose-mid));}
+.cta-inner{max-width:520px;margin:0 auto;}
+.cta-inner h2{
+    font-family:'Playfair Display',serif;
+    font-size:clamp(30px,4.5vw,50px);font-weight:400;
+    color:var(--ink);line-height:1.15;margin-bottom:16px;
+}
+.cta-inner h2 em{font-style:normal;color:var(--rose);}
+.cta-inner p{font-size:14px;font-weight:300;color:var(--ink3);line-height:1.8;margin-bottom:32px;}
 
-        .hero-stat {
-            padding: 40px 36px;
-            border-bottom: 1px solid var(--border-md);
-            border-right: 1px solid var(--border-md);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            transition: background 0.2s;
-        }
-        .hero-stat:hover { background: var(--cream); }
-        .hero-stat:nth-child(even) { border-right: none; }
-        .hero-stat:nth-child(3),
-        .hero-stat:nth-child(4) { border-bottom: none; }
+.sec-about{background:var(--bg);}
+.about-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:72px;align-items:start;}
+.about-list{display:flex;flex-direction:column;gap:28px;}
+.ai{display:flex;gap:16px;}
+.ai-dot{width:7px;height:7px;border-radius:50%;background:var(--rose);flex-shrink:0;margin-top:6px;}
+.ai-t{font-size:13.5px;font-weight:500;color:var(--ink);margin-bottom:4px;}
+.ai-d{font-size:12.5px;font-weight:300;color:var(--ink3);line-height:1.75;}
+.about-panel{
+    background:linear-gradient(150deg,var(--rose-pale) 0%,#fff 100%);
+    border:1px solid var(--line);
+    border-radius:12px;padding:40px;
+    display:flex;flex-direction:column;gap:28px;
+}
+.panel-stat{border-bottom:1px solid var(--line);padding-bottom:22px;}
+.panel-stat:last-child{border-bottom:none;padding-bottom:0;}
+.pv{
+    font-family:'Playfair Display',serif;
+    font-size:42px;font-weight:400;color:var(--rose);line-height:1;
+}
+.pl{font-size:10.5px;letter-spacing:1px;text-transform:uppercase;color:var(--ink3);margin-top:5px;}
 
-        .stat-num {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 48px;
-            font-weight: 700;
-            color: var(--ink);
-            line-height: 1;
-            margin-bottom: 8px;
-            letter-spacing: -1px;
-        }
-        .stat-num.rose { color: var(--rose); }
-        .stat-label {
-            font-size: 12px;
-            font-weight: 400;
-            color: var(--muted);
-            line-height: 1.5;
-            letter-spacing: 0.01em;
-        }
+.disc{
+    text-align:center;padding:26px 48px;
+    border-top:1px solid var(--line);
+    font-size:11.5px;letter-spacing:0.2px;color:var(--ink3);
+    background:var(--bg2);
+}
+.disc span{color:var(--rose);font-weight:500;}
 
-        /* ─── DIVIDER ─── */
-        .divider {
-            height: 1px;
-            background: var(--border-md);
-        }
+.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.65s ease,transform 0.65s ease;}
+.reveal.shown{opacity:1;transform:translateY(0);}
 
-        /* ─── FEATURES ─── */
-        .features {
-            padding: 100px 56px;
-            background: var(--white);
-        }
-
-        .section-header {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 48px;
-            align-items: end;
-            margin-bottom: 64px;
-            padding-bottom: 48px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .eyebrow {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .eyebrow-line { width: 24px; height: 1px; background: var(--rose); }
-        .eyebrow span {
-            font-size: 10.5px;
-            font-weight: 500;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--rose);
-        }
-
-        .section-title {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 42px;
-            font-weight: 700;
-            line-height: 1.1;
-            letter-spacing: -1px;
-            color: var(--ink);
-        }
-        .section-title em { font-style: italic; color: var(--rose); font-weight: 400; }
-
-        .section-desc {
-            font-size: 15px;
-            font-weight: 300;
-            color: var(--muted);
-            line-height: 1.8;
-            align-self: end;
-        }
-
-        .features-list {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0;
-            border: 1px solid var(--border-md);
-        }
-
-        .feature-item {
-            padding: 40px 36px;
-            border-right: 1px solid var(--border-md);
-            border-bottom: 1px solid var(--border-md);
-            transition: background 0.2s;
-        }
-        .feature-item:hover { background: var(--cream); }
-        .feature-item:nth-child(3n) { border-right: none; }
-        .feature-item:nth-child(4),
-        .feature-item:nth-child(5),
-        .feature-item:nth-child(6) { border-bottom: none; }
-
-        .feature-num {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 11px;
-            font-weight: 400;
-            color: var(--muted-lt);
-            margin-bottom: 24px;
-            letter-spacing: 0.08em;
-        }
-
-        .feature-icon {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--rose);
-            margin-bottom: 20px;
-        }
-
-        .feature-title {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 17px;
-            font-weight: 700;
-            color: var(--ink);
-            margin-bottom: 12px;
-            letter-spacing: -0.3px;
-        }
-
-        .feature-desc {
-            font-size: 13.5px;
-            font-weight: 300;
-            color: var(--muted);
-            line-height: 1.75;
-        }
-
-        /* ─── METHODS ─── */
-        .methods-section {
-            padding: 100px 56px;
-            background: var(--cream);
-        }
-
-        .methods-header {
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            margin-bottom: 48px;
-            padding-bottom: 32px;
-            border-bottom: 1px solid var(--border-md);
-            gap: 32px;
-        }
-
-        .methods-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 0;
-            border: 1px solid var(--border-md);
-            background: var(--white);
-        }
-
-        .method-item {
-            padding: 28px 24px;
-            border-right: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: background 0.18s;
-        }
-        .method-item:hover { background: var(--rose-pale); }
-        .method-item:nth-child(4n) { border-right: none; }
-        .method-item:nth-child(9),
-        .method-item:nth-child(10),
-        .method-item:nth-child(11) { border-bottom: none; }
-
-        .method-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-        .method-name {
-            font-size: 13px;
-            font-weight: 400;
-            color: var(--ink-soft);
-            line-height: 1.4;
-        }
-
-        /* ─── CTA ─── */
-        .cta-section {
-            background: var(--ink);
-            padding: 100px 56px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .cta-texture {
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-            background-size: 48px 48px;
-        }
-
-        .cta-inner {
-            position: relative;
-            z-index: 1;
-            max-width: 1100px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-            gap: 80px;
-        }
-
-        .cta-kicker {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 28px;
-        }
-        .cta-kicker-line { width: 24px; height: 1px; background: var(--rose); }
-        .cta-kicker span {
-            font-size: 10.5px;
-            font-weight: 500;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-            color: var(--rose);
-        }
-
-        .cta-title {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 50px;
-            font-weight: 700;
-            color: var(--white);
-            letter-spacing: -1.5px;
-            line-height: 1.05;
-            margin-bottom: 20px;
-        }
-        .cta-title em { font-style: italic; color: var(--rose); font-weight: 400; }
-
-        .cta-desc {
-            font-size: 15px;
-            font-weight: 300;
-            color: rgba(255,255,255,0.4);
-            line-height: 1.8;
-            max-width: 460px;
-        }
-
-        .cta-right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 16px;
-            flex-shrink: 0;
-        }
-
-        .btn-cta {
-            padding: 16px 40px;
-            background: var(--rose);
-            color: var(--white);
-            font-family: 'Jost', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            letter-spacing: 0.06em;
-            text-decoration: none;
-            border-radius: 2px;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: background 0.2s, transform 0.15s;
-            white-space: nowrap;
-        }
-        .btn-cta:hover { background: var(--rose-deep); transform: translateY(-1px); color: var(--white); text-decoration: none; }
-
-        .cta-note {
-            font-size: 11px;
-            color: rgba(255,255,255,0.2);
-            letter-spacing: 0.04em;
-        }
-
-        /* ─── FOOTER ─── */
-        footer {
-            background: var(--ink);
-            border-top: 1px solid rgba(255,255,255,0.06);
-            padding: 28px 56px;
-        }
-
-        .footer-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 24px;
-            flex-wrap: wrap;
-        }
-
-        .footer-brand {
-            font-family: 'Libre Baskerville', serif;
-            font-size: 16px;
-            font-weight: 700;
-            color: rgba(255,255,255,0.5);
-            text-decoration: none;
-        }
-        .footer-brand em { font-style: italic; color: var(--rose); }
-
-        .footer-mid {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .footer-mid .dash { width: 16px; height: 1px; background: var(--rose); opacity: 0.5; }
-        .footer-mid span { font-size: 11px; color: rgba(255,255,255,0.2); letter-spacing: 0.06em; }
-
-        .footer-copy { font-size: 11px; color: rgba(255,255,255,0.15); }
-
-        /* ─── RESPONSIVE ─── */
-        @media (max-width: 960px) {
-            nav { padding: 0 24px; }
-            .nav-center { display: none; }
-            .hero { grid-template-columns: 1fr; min-height: auto; }
-            .hero-left { padding: 60px 24px; border-right: none; border-bottom: 1px solid var(--border-md); }
-            .hero-title { font-size: 44px; }
-            .hero-right { min-height: 400px; }
-            .features { padding: 72px 24px; }
-            .section-header { grid-template-columns: 1fr; }
-            .features-list { grid-template-columns: 1fr; }
-            .feature-item { border-right: none; }
-            .feature-item:nth-child(n) { border-bottom: 1px solid var(--border-md); }
-            .feature-item:last-child { border-bottom: none; }
-            .methods-section { padding: 72px 24px; }
-            .methods-header { flex-direction: column; align-items: flex-start; }
-            .methods-grid { grid-template-columns: 1fr 1fr; }
-            .method-item:nth-child(2n) { border-right: none; }
-            .method-item:nth-child(4n) { border-right: none; }
-            .cta-section { padding: 72px 24px; }
-            .cta-inner { grid-template-columns: 1fr; gap: 40px; }
-            .cta-title { font-size: 36px; }
-            footer { padding: 24px; }
-        }
-    </style>
+@media(max-width:1024px){
+    .mgrid{grid-template-columns:repeat(3,1fr);}
+    .about-grid{grid-template-columns:1fr;}
+    .about-panel{display:none;}
+}
+@media(max-width:768px){
+    nav{padding:0 20px;}
+    .hero{padding:100px 24px 70px;}
+    .hero-stats{gap:32px;flex-wrap:wrap;justify-content:center;}
+    .wrap{padding:0 24px;}
+    .steps{grid-template-columns:1fr;}
+    .step{border-right:none;border-bottom:1px solid var(--line);}
+    .mgrid{grid-template-columns:repeat(2,1fr);gap:12px;}
+    .sec-cta{padding:72px 24px;}
+    .disc{padding:22px 24px;}
+}
+@media(max-width:480px){.mgrid{grid-template-columns:1fr;}}
+</style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
-    <a href="#" class="nav-brand">Contra<em>Choice</em></a>
-    <div class="nav-center">
-        <a href="#features">Features</a>
-        <a href="#methods">Methods</a>
-        <a href="#about">About</a>
-    </div>
-    <a href="user/login.php" class="btn-signin">Sign In</a>
+    <div class="logo">ContraChoice</div>
+    <ul class="nav-links">
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="#methods">Methods</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="/hci/user/login.php" class="cta">Login</a></li>
+    </ul>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-    <div class="hero-left">
-        <div class="hero-kicker">
-            <div class="hero-kicker-line"></div>
-            <span>Women's Health · SEAIT</span>
-        </div>
-        <h1 class="hero-title">
-            Know your<br>
-            <em>contraceptive</em><br>
-            options.
-        </h1>
-        <p class="hero-desc">
-            ContraChoice helps women make informed, confident decisions about birth control — through guided questionnaires, side-by-side comparisons, and personalized recommendations.
-        </p>
-        <div class="hero-actions">
-            <a href="user/login.php" class="btn-primary">
-                Get Started
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M12 6l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-            <a href="#features" class="btn-text">
-                Learn more
-                <svg width="12" height="12" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-        </div>
-    </div>
-    <div class="hero-right">
-        <div class="hero-stat-grid">
-            <div class="hero-stat">
-                <div class="stat-num">11</div>
-                <div class="stat-label">Contraceptive methods covered</div>
-            </div>
-            <div class="hero-stat">
-                <div class="stat-num rose">99.9<span style="font-size:20px;letter-spacing:0;">%</span></div>
-                <div class="stat-label">Highest effectiveness available</div>
-            </div>
-            <div class="hero-stat">
-                <div class="stat-num" style="font-size:36px; letter-spacing:-0.5px;">Free</div>
-                <div class="stat-label">No cost, always accessible</div>
-            </div>
-            <div class="hero-stat">
-                <div class="stat-num rose" style="font-size:36px; letter-spacing:0;">AI</div>
-                <div class="stat-label">Powered chatbot for your questions</div>
-            </div>
-        </div>
-    </div>
-</section>
+<div class="hero">
+    <div class="hero-deco deco1"></div>
+    <div class="hero-deco deco2"></div>
+    <div class="hero-deco deco3"></div>
 
-<!-- FEATURES -->
-<section class="features" id="features">
-    <div class="section-header">
-        <div>
-            <div class="eyebrow">
-                <div class="eyebrow-line"></div>
-                <span>What we offer</span>
-            </div>
-            <h2 class="section-title">Tools built for<br><em>informed choices</em></h2>
-        </div>
-        <p class="section-desc">Everything you need to understand, compare, and choose the right contraceptive method for your lifestyle and health.</p>
-    </div>
-    <div class="features-list">
-        <div class="feature-item">
-            <div class="feature-num">01</div>
-            <div class="feature-icon">
-                <svg width="24" height="24" viewBox="0 0 20 20" fill="none"><path d="M2.5 5h15M2.5 10h9M2.5 15h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="15.5" cy="14.5" r="2.5" stroke="currentColor" stroke-width="1.6"/><path d="M17.5 16.5l1.5 1.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </div>
-            <div class="feature-title">Smart Questionnaire</div>
-            <p class="feature-desc">Answer a few guided questions about your health, lifestyle, and preferences to receive a tailored contraceptive recommendation.</p>
-        </div>
-        <div class="feature-item">
-            <div class="feature-num">02</div>
-            <div class="feature-icon">
-                <svg width="24" height="24" viewBox="0 0 20 20" fill="none"><rect x="2" y="4" width="7" height="12" rx="1.5" stroke="currentColor" stroke-width="1.6"/><rect x="11" y="4" width="7" height="12" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M9 10h2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </div>
-            <div class="feature-title">Comparison Guide</div>
-            <p class="feature-desc">Compare contraceptive methods side by side — effectiveness, cost, side effects, and suitability — all in one clear view.</p>
-        </div>
-        <div class="feature-item">
-            <div class="feature-num">03</div>
-            <div class="feature-icon">
-                <svg width="24" height="24" viewBox="0 0 20 20" fill="none"><rect x="3" y="5" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="10" r="1.5" fill="currentColor"/><circle cx="12" cy="10" r="1.5" fill="currentColor"/></svg>
-            </div>
-            <div class="feature-title">AI Chatbot</div>
-            <p class="feature-desc">Have your questions answered anytime by our AI assistant — private, non-judgmental, and always available when you need guidance.</p>
-        </div>
-        <div class="feature-item">
-            <div class="feature-num">04</div>
-            <div class="feature-icon">
-                <svg width="24" height="24" viewBox="0 0 20 20" fill="none"><path d="M10 2.5l2.2 4.5L17 7.7l-3.5 3.4.8 4.9L10 13.7l-4.3 2.3.8-4.9L3 7.7l4.8-.7L10 2.5z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-            </div>
-            <div class="feature-title">Personalized Picks</div>
-            <p class="feature-desc">Get recommendations matched specifically to your profile — taking into account your age, health conditions, and contraceptive goals.</p>
-        </div>
-        <div class="feature-item">
-            <div class="feature-num">05</div>
-            <div class="feature-icon">
-                <svg width="24" height="24" viewBox="0 0 20 20" fill="none"><path d="M3 4h14v10h-7l-4 4v-4H3V4z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-            </div>
-            <div class="feature-title">Anonymous Forum</div>
-            <p class="feature-desc">Share experiences and ask questions in a safe, anonymous community of women navigating the same decisions as you.</p>
-        </div>
-        <div class="feature-item">
-            <div class="feature-num">06</div>
-            <div class="feature-icon">
-                <svg width="24" height="24" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.6"/><path d="M10 6v4.5l3 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </div>
-            <div class="feature-title">Always Available</div>
-            <p class="feature-desc">Access ContraChoice anytime, from any device. Your health information and recommendations are saved securely to your account.</p>
+    <div style="position:relative;z-index:2;">
+        <div class="hero-eyebrow">Contraceptive Guidance Platform</div>
+        <h1 class="hero-title">Find the <em>right</em></h1>
+        <div class="hero-sub">contraceptive for you</div>
+        <p class="hero-desc">A personalized questionnaire matched to your health, lifestyle, and goals — to help you walk into any clinic informed.</p>
+        <div class="hero-stats">
+            <div><span class="sv"><?= count($methods) ?>+</span><div class="sl">Methods</div></div>
+            <div><span class="sv">99.9%</span><div class="sl">Max Effectiveness</div></div>
+            <div><span class="sv"><?= count($category_labels) ?></span><div class="sl">Categories</div></div>
         </div>
     </div>
-</section>
 
-<!-- METHODS -->
-<section class="methods-section" id="methods">
-    <div class="methods-header">
-        <div>
-            <div class="eyebrow">
-                <div class="eyebrow-line"></div>
-                <span>Covered methods</span>
+    <div class="scroll-hint">
+        <div class="scroll-line"></div>
+        Scroll
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="sec sec-how" id="how">
+    <div class="wrap">
+        <div class="reveal">
+            <div class="sec-tag">How It Works</div>
+            <h2 class="sec-title">Three steps to your <em>best match</em></h2>
+            <p class="sec-sub">Our guided questionnaire analyzes your health profile and surfaces the most suitable options for you.</p>
+        </div>
+        <div class="steps reveal">
+            <div class="step">
+                <div class="step-n">01</div>
+                <div class="step-t">Answer the Questionnaire</div>
+                <p class="step-d">Share details about your health, lifestyle, smoking status, breastfeeding, and contraceptive preferences in a short, private form.</p>
             </div>
-            <h2 class="section-title">11 methods,<br><em>one platform</em></h2>
-        </div>
-        <p class="section-desc" style="max-width:340px;">From daily pills to long-term devices, we cover the full range of contraceptive options available to women today.</p>
-    </div>
-    <div class="methods-grid">
-        <div class="method-item"><div class="method-dot" style="background:#b85c5c;"></div><span class="method-name">Combined Oral Contraceptive Pill</span></div>
-        <div class="method-item"><div class="method-dot" style="background:#b85c5c;"></div><span class="method-name">Progestin-Only Pill</span></div>
-        <div class="method-item"><div class="method-dot" style="background:#5c7e74;"></div><span class="method-name">Hormonal IUD</span></div>
-        <div class="method-item"><div class="method-dot" style="background:#5c7e74;"></div><span class="method-name">Copper IUD</span></div>
-        <div class="method-item"><div class="method-dot" style="background:#b07a5c;"></div><span class="method-name">Injectable Contraceptive</span></div>
-        <div class="method-item"><div class="method-dot" style="background:#5c6e9e;"></div><span class="method-name">Condom</span></div>
-        <div class="method-item"><div class="method-dot" style="background:#5c7e74;"></div><span class="method-name">Contraceptive Implant</span></div>
-        <div class="method-item"><div class="method-dot" style="background:#8a6e9e;"></div><span class="method-name">Fertility Awareness Method</span></div>
-        <div class="method-item"><div class="method-dot" style="background:#5c6e9e;"></div><span class="method-name">Diaphragm with Spermicide</span></div>
-        <div class="method-item"><div class="method-dot" style="background:#b85c5c;"></div><span class="method-name">Emergency Contraceptive Pill</span></div>
-        <div class="method-item"><div class="method-dot" style="background:#8a8278;"></div><span class="method-name">Bilateral Tubal Ligation</span></div>
-        <div class="method-item" style="background:var(--cream); border:none; cursor:default;"></div>
-    </div>
-</section>
-
-<!-- CTA -->
-<section class="cta-section" id="about">
-    <div class="cta-texture"></div>
-    <div class="cta-inner">
-        <div>
-            <div class="cta-kicker">
-                <div class="cta-kicker-line"></div>
-                <span>Get started today</span>
+            <div class="step">
+                <div class="step-n">02</div>
+                <div class="step-t">Get Personalized Results</div>
+                <p class="step-d">Our system scores and ranks methods based on your specific answers and health profile — surfacing the best fits for you.</p>
             </div>
-            <h2 class="cta-title">Ready to make<br>an <em>informed</em> choice?</h2>
-            <p class="cta-desc">Create your free account and take the guided questionnaire to find the contraceptive method that fits your life.</p>
-        </div>
-        <div class="cta-right">
-            <a href="user/login.php" class="btn-cta">
-                Sign In or Register
-                <svg width="14" height="14" viewBox="0 0 20 20" fill="none"><path d="M4 10h12M12 6l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </a>
-            <div class="cta-note">Free to use · No prescription needed</div>
+            <div class="step">
+                <div class="step-n">03</div>
+                <div class="step-t">Consult Your Provider</div>
+                <p class="step-d">Use your results as a starting point with a healthcare professional. ContraChoice informs — your doctor decides.</p>
+            </div>
         </div>
     </div>
-</section>
+</div>
 
-<!-- FOOTER -->
-<footer>
-    <div class="footer-inner">
-        <a href="#" class="footer-brand">Contra<em>Choice</em></a>
-        <div class="footer-mid">
-            <div class="dash"></div>
-            <span>SEAIT · Women's Health Research</span>
+<div class="divider"></div>
+
+<div class="sec sec-methods" id="methods">
+    <div class="wrap">
+        <div class="reveal">
+            <div class="sec-tag">Contraceptive Methods</div>
+            <h2 class="sec-title">All <?= count($methods) ?> methods, <em>explained</em></h2>
+            <p class="sec-sub" style="margin-bottom:32px;">From daily pills to long-term devices and natural tracking — every option, clearly laid out.</p>
+            <div class="filter-bar">
+                <button class="fb on" onclick="filt(this,'all')">All</button>
+                <?php foreach ($category_labels as $key => $lbl): ?>
+                <button class="fb" onclick="filt(this,'<?= $key ?>')"><?= $lbl ?></button>
+                <?php endforeach; ?>
+            </div>
         </div>
-        <div class="footer-copy">© 2026 ContraChoice. All rights reserved.</div>
+        <div class="mgrid reveal" id="mgrid">
+            <?php
+            $cost_cls = ['low'=>'t-low','medium'=>'t-med','high'=>'t-high'];
+            foreach ($methods as $m):
+                $cat = $m['category'];
+            ?>
+            <div class="mc" data-cat="<?= $cat ?>">
+                <div class="mc-img">
+                    <?php if (!empty($m['image_path'])): ?>
+                        <img src="/hci/uploads/contraceptive_methods/<?= htmlspecialchars($m['image_path']) ?>"
+                             alt="<?= htmlspecialchars($m['name']) ?>">
+                    <?php else: ?>
+                        <div class="mc-placeholder">
+                            <i class="fa-solid <?= $cat_icons[$cat] ?>"></i>
+                            <span>No image</span>
+                        </div>
+                    <?php endif; ?>
+                    <span class="mc-badge"><?= $category_labels[$cat] ?></span>
+                </div>
+                <div class="mc-body">
+                    <div class="mc-name"><?= htmlspecialchars($m['name']) ?></div>
+                    <p class="mc-desc"><?= htmlspecialchars($m['description']) ?></p>
+                    <div class="mc-foot">
+                        <div class="mc-eff"><?= number_format($m['effectiveness'],1) ?><span>% effective</span></div>
+                        <div class="mc-tags">
+                            <?php if ($m['is_hormone_free']): ?><span class="tag t-hf">Hormone-free</span><?php endif; ?>
+                            <span class="tag <?= $cost_cls[$m['cost_level']] ?>"><?= ucfirst($m['cost_level']) ?> cost</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
     </div>
-</footer>
+</div>
 
+<div class="divider"></div>
+
+<div class="sec-cta">
+    <div class="cta-line"></div>
+    <div class="cta-inner reveal">
+        <h2>Not sure where<br>to <em>start?</em></h2>
+        <p>Login to access your personalized questionnaire and get contraceptive options ranked by how well they fit your profile.</p>
+        <a href="/hci/user/login.php" class="btn-primary">Login to Get Started</a>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="sec sec-about" id="about">
+    <div class="wrap">
+        <div class="reveal" style="margin-bottom:48px;">
+            <div class="sec-tag">About ContraChoice</div>
+            <h2 class="sec-title">Information that <em>empowers</em></h2>
+            <p class="sec-sub">An educational platform built on established medical knowledge. We inform — you and your doctor decide.</p>
+        </div>
+        <div class="about-grid reveal">
+            <div class="about-list">
+                <div class="ai">
+                    <div class="ai-dot"></div>
+                    <div><div class="ai-t">Comprehensive Method Database</div>
+                    <p class="ai-d">Covers <?= count($methods) ?> methods across <?= count($category_labels) ?> categories including effectiveness rates, delivery methods, and contraindications.</p></div>
+                </div>
+                <div class="ai">
+                    <div class="ai-dot"></div>
+                    <div><div class="ai-t">Personalized Scoring System</div>
+                    <p class="ai-d">The questionnaire accounts for smoking status, breastfeeding, health conditions, hormone preferences, budget, and delivery preference.</p></div>
+                </div>
+                <div class="ai">
+                    <div class="ai-dot"></div>
+                    <div><div class="ai-t">Community Forum</div>
+                    <p class="ai-d">Read real experiences and ask questions anonymously. Learn from others who have used these methods.</p></div>
+                </div>
+                <div class="ai">
+                    <div class="ai-dot"></div>
+                    <div><div class="ai-t">Educational Use Only</div>
+                    <p class="ai-d">ContraChoice does not provide medical advice. Always consult a licensed healthcare provider before starting or changing any contraceptive method.</p></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="disc">
+    &copy; <?= date('Y') ?> <span>ContraChoice</span> 
+</div>
+
+<script>
+function filt(btn,cat){
+    document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    document.querySelectorAll('.mc').forEach(c=>{
+        c.classList.toggle('hidden',cat!=='all'&&c.dataset.cat!==cat);
+    });
+}
+
+const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+        if(e.isIntersecting){e.target.classList.add('shown');obs.unobserve(e.target);}
+    });
+},{threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+        const t=document.querySelector(a.getAttribute('href'));
+        if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
+    });
+});
+</script>
 </body>
 </html>
