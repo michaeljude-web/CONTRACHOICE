@@ -178,7 +178,6 @@ $active_page = $active_page ?? 'dashboard';
 <div class="admin-sidebar">
     <div class="sidebar-logo">
         <div class="logo-wordmark">ADMINISTRATOR</div>
-        <!-- <div class="logo-tagline">Administrator</div> -->
     </div>
 
     <nav class="sidebar-nav">
