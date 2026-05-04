@@ -66,12 +66,52 @@ nav{
     backdrop-filter:blur(16px);
     -webkit-backdrop-filter:blur(16px);
 }
-.logo{
-    font-family:'Jost',sans-serif;
-    font-size:21px;font-weight:600;letter-spacing:0.5px;
-    color:#000000;
+
+.mylogo-wrapper{
+    display:inline-flex;
+    flex-direction:column;
+    align-items:center;
+    line-height:1;
+    gap:3px;
+    font-family:'Playfair Display','Georgia','Times New Roman',serif;
 }
-.logo span{color:var(--rose);}
+.mylogo-brand{
+    font-size:20px;
+    font-weight:900;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    display:inline-block;
+}
+.mylogo-contra{
+    font-style:italic;
+    font-weight:700;
+    letter-spacing:0.05em;
+    color:#343232;
+}
+.mylogo-choice{
+    font-weight:900;
+    color:#ba485b;
+}
+.mylogo-divider{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+}
+.mylogo-line{
+    width:28px;
+    height:1px;
+    background:#f4c1cc;
+    opacity:0.9;
+}
+.mylogo-diamond{
+    width:5px;
+    height:5px;
+    background:#d36e7e;
+    transform:rotate(45deg);
+    border-radius:1px;
+}
+
 .nav-links{display:flex;align-items:center;gap:2px;list-style:none;}
 .nav-links a{
     font-size:13px;font-weight:400;letter-spacing:0.3px;
@@ -380,7 +420,16 @@ nav{
 <body>
 
 <nav>
-    <div class="logo">ContraChoice</div>
+    <div class="mylogo-wrapper">
+        <div class="mylogo-brand">
+            <span class="mylogo-contra">Contra</span><span class="mylogo-choice">Choice</span>
+        </div>
+        <div class="mylogo-divider">
+            <span class="mylogo-line"></span>
+            <span class="mylogo-diamond"></span>
+            <span class="mylogo-line"></span>
+        </div>
+    </div>
     <ul class="nav-links">
         <li><a href="#how">How It Works</a></li>
         <li><a href="#methods">Methods</a></li>

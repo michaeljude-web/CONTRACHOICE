@@ -21,7 +21,6 @@ $user_nav = [
   ['id' => 'recommendations', 'label' => 'My recommendations', 'icon' => 'star',        'color' => 'mauve'],
   ['section' => 'Community'],
   ['id' => 'forum',           'label' => 'Anonymous forum',    'icon' => 'chat',        'color' => 'sky'],
-  // ['id' => 'chatbot',         'label' => 'AI chatbot',         'icon' => 'bot',         'color' => 'sage'],
   ['section' => 'Account'],
   ['id' => 'settings',        'label' => 'Settings',           'icon' => 'settings',    'color' => 'neutral'],
 ];
@@ -61,7 +60,7 @@ $icons = [
 ?>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap');
 
 :root {
   --lavender:    #C9B8F0;
@@ -106,7 +105,7 @@ $icons = [
 .sidebar {
   width: var(--sidebar-w);
   height: 100vh;
-  background: var(--surface);
+  background: rgb(255, 255, 255);
   border-right: 1px solid var(--border-md);
   display: flex;
   flex-direction: column;
@@ -115,31 +114,70 @@ $icons = [
 }
 
 .sidebar-logo {
-  padding: 24px 20px 16px;
+  padding: 22px 20px 14px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
 
-.logo-wordmark {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px;
-  font-weight: 600;
-  color: var(--ink);
-  letter-spacing: -0.5px;
+.mylogo-wrapper {
+  display: inline-block;
+  text-align: center;
   line-height: 1;
+  font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+  width: 100%;
 }
 
-.logo-wordmark em {
+.mylogo-brand {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.mylogo-contra {
   font-style: italic;
-  color: var(--blush-d);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #343232;
+}
+
+.mylogo-choice {
+  font-weight: 900;
+  color: #ba485b;
+}
+
+.mylogo-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 0.4rem;
+}
+
+.mylogo-line {
+  width: 60px;
+  height: 1.5px;
+  background: #f4c1cc;
+  opacity: 0.9;
+}
+
+.mylogo-diamond {
+  width: 7px;
+  height: 7px;
+  background: #d36e7e;
+  transform: rotate(45deg);
+  border-radius: 1px;
 }
 
 .logo-tagline {
   font-size: 10px;
   color: var(--muted);
-  margin-top: 5px;
+  margin-top: 8px;
   letter-spacing: 0.05em;
   font-weight: 400;
+  font-family: 'DM Sans', sans-serif;
+  text-align: center;
 }
 
 .sidebar-nav {
@@ -459,8 +497,16 @@ $icons = [
 <aside class="sidebar" id="cc-sidebar">
 
   <div class="sidebar-logo">
-    <div class="logo-wordmark">ContraChoice</div>
-    <div class="logo-tagline"><?= $is_admin ? 'Admin Panel' : "Women's Health Companion" ?></div>
+    <div class="mylogo-wrapper">
+      <div class="mylogo-brand">
+        <span class="mylogo-contra">Contra</span><span class="mylogo-choice">Choice</span>
+      </div>
+      <div class="mylogo-divider">
+        <span class="mylogo-line"></span>
+        <span class="mylogo-diamond"></span>
+        <span class="mylogo-line"></span>
+      </div>
+    </div>
   </div>
 
   <nav class="sidebar-nav">

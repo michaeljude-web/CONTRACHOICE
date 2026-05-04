@@ -70,7 +70,7 @@ if (isset($_POST['register'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login — ContraChoice</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/vendor/bootstrap-5/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/vendor/fontawesome-7/css/all.min.css">
     <style>
@@ -119,9 +119,36 @@ if (isset($_POST['register'])) {
             border-radius: 50%;
             border: 1px solid rgba(193,102,107,0.15);
         }
-        .arc-1 { width: 480px; height: 480px; bottom: -160px; right: -160px; }
-        .arc-2 { width: 280px; height: 280px; bottom: -60px;  right: -60px;  border-color: rgba(193,102,107,0.25); }
-        .arc-3 { width: 120px; height: 120px; bottom: 30px;   right: 10px;   border-color: rgba(193,102,107,0.4); }
+        .arc-1 {
+            width: 480px; height: 480px;
+            bottom: -160px; right: -160px;
+            animation: arcFloat1 12s ease-in-out infinite;
+        }
+        .arc-2 {
+            width: 280px; height: 280px;
+            bottom: -60px; right: -60px;
+            border-color: rgba(193,102,107,0.25);
+            animation: arcFloat2 10s ease-in-out infinite;
+        }
+        .arc-3 {
+            width: 120px; height: 120px;
+            bottom: 30px; right: 10px;
+            border-color: rgba(193,102,107,0.4);
+            animation: arcPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes arcFloat1 {
+            0%,100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(6deg) scale(1.03); }
+        }
+        @keyframes arcFloat2 {
+            0%,100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(-5deg) scale(0.98); }
+        }
+        @keyframes arcPulse {
+            0%,100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.08); opacity: 1; }
+        }
 
         .brand-area { position: relative; z-index: 2; }
 
@@ -153,15 +180,55 @@ if (isset($_POST['register'])) {
             color: var(--rose-pale);
         }
 
-        .brand-name {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 58px;
-            font-weight: 600;
-            color: #fff;
+        .mylogo-wrapper {
+            display: inline-block;
+            text-align: center;
             line-height: 1;
-            letter-spacing: -1.5px;
+            font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
         }
-        .brand-name em { color: var(--rose); font-style: italic; }
+
+        .mylogo-brand {
+            font-size: 58px;
+            font-weight: 900;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .mylogo-contra {
+            font-style: italic;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #ffffff;
+        }
+
+        .mylogo-choice {
+            font-weight: 900;
+            color: #ba485b;
+        }
+
+        .mylogo-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 0.4rem;
+        }
+
+        .mylogo-line {
+            width: 48px;
+            height: 1.5px;
+            background: #f4c1cc;
+            opacity: 0.9;
+        }
+
+        .mylogo-diamond {
+            width: 7px;
+            height: 7px;
+            background: #d36e7e;
+            transform: rotate(45deg);
+            border-radius: 1px;
+        }
 
         .panel-bottom { position: relative; z-index: 2; }
 
@@ -234,6 +301,11 @@ if (isset($_POST['register'])) {
             border-radius: 12px;
             font-size: 13px;
             margin-bottom: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .cc-alert-error {
             background: #FDF0F1;
@@ -352,8 +424,9 @@ if (isset($_POST['register'])) {
             color: var(--rose);
             font-weight: 600;
             text-decoration: none;
+            transition: color 0.2s;
         }
-        .signup-row a:hover { text-decoration: underline; }
+        .signup-row a:hover { color: var(--rose-deep); text-decoration: underline; }
 
         .modal-content {
             border: none;
@@ -398,9 +471,29 @@ if (isset($_POST['register'])) {
 
         .modal-body { padding: 28px; }
 
+        @media (max-width: 1024px) {
+            .illus-panel {
+                width: 42%;
+                padding: 40px 32px;
+            }
+            .mylogo-brand {
+                font-size: 44px;
+            }
+            .mylogo-line {
+                width: 36px;
+            }
+            .arc-1 { width: 360px; height: 360px; bottom: -120px; right: -120px; }
+            .arc-2 { width: 210px; height: 210px; bottom: -50px; right: -50px; }
+            .arc-3 { width: 90px; height: 90px; bottom: 20px; right: 10px; }
+        }
         @media (max-width: 820px) {
             .illus-panel { display: none; }
             .form-panel { padding: 36px 24px; }
+            .form-heading { font-size: 36px; }
+        }
+        @media (max-width: 480px) {
+            .form-box { max-width: 100%; }
+            .form-heading { font-size: 32px; }
         }
     </style>
 </head>
@@ -417,13 +510,15 @@ if (isset($_POST['register'])) {
             <div class="pip"></div>
             <span>Women's Health</span>
         </div>
-        <div class="brand-name">Contra<em>Choice</em></div>
-    </div>
-
-    <div class="panel-bottom">
-        <div class="inst-row">
-            <div class="inst-dash"></div>
-            <div class="inst-name">SEAIT</div>
+        <div class="mylogo-wrapper">
+            <div class="mylogo-brand">
+                <span class="mylogo-contra">Contra</span><span class="mylogo-choice">Choice</span>
+            </div>
+            <div class="mylogo-divider">
+                <span class="mylogo-line"></span>
+                <span class="mylogo-diamond"></span>
+                <span class="mylogo-line"></span>
+            </div>
         </div>
     </div>
 </div>

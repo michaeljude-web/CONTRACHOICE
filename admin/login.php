@@ -3,7 +3,6 @@ session_start();
 require_once '../includes/db_connection.php';
 require_once '../includes/admin/auth.php';
 
-// Redirect if already logged in
 if (isAdminLoggedIn()) {
     header('Location: dashboard.php');
     exit;
@@ -46,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login — ContraChoice</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../assets/vendor/bootstrap-5/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/vendor/fontawesome-7/css/all.min.css">
     <style>
@@ -71,7 +70,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             overflow: hidden;
         }
 
-        /* ── Left panel ── */
         .panel-left {
             width: 45%;
             background: var(--ink);
@@ -83,7 +81,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             overflow: hidden;
         }
 
-        /* Decorative rings */
         .panel-left::before,
         .panel-left::after {
             content: '';
@@ -94,11 +91,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .panel-left::before {
             width: 520px; height: 520px;
             bottom: -180px; right: -180px;
+            animation: arcFloat1 14s ease-in-out infinite;
         }
         .panel-left::after {
             width: 320px; height: 320px;
             bottom: -80px; right: -80px;
             border-color: rgba(193,102,107,0.28);
+            animation: arcFloat2 11s ease-in-out infinite;
         }
 
         .ring-extra {
@@ -108,6 +107,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid rgba(193,102,107,0.35);
             bottom: 40px; right: 20px;
             pointer-events: none;
+            animation: ringPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes arcFloat1 {
+            0%,100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(5deg) scale(1.04); }
+        }
+        @keyframes arcFloat2 {
+            0%,100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(-4deg) scale(0.96); }
+        }
+        @keyframes ringPulse {
+            0%,100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.06); opacity: 0.85; }
         }
 
         .dot-grid {
@@ -130,13 +143,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid rgba(193,102,107,0.3);
             border-radius: 40px;
             padding: 6px 14px 6px 10px;
-            margin-bottom: 36px;
+            margin-bottom: 28px;
         }
 
         .brand-pill .dot {
             width: 8px; height: 8px;
             background: var(--rose);
             border-radius: 50%;
+            animation: dotPulse 2.2s ease-in-out infinite;
+        }
+        @keyframes dotPulse {
+            0%,100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.75); }
         }
 
         .brand-pill span {
@@ -147,18 +165,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-transform: uppercase;
         }
 
-        .brand-name {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 56px;
-            font-weight: 600;
-            color: #fff;
+        .mylogo-wrapper {
+            display: inline-block;
+            text-align: center;
             line-height: 1;
-            letter-spacing: -1px;
+            font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
         }
-
-        .brand-name em {
-            color: var(--rose);
+        .mylogo-brand {
+            font-size: 52px;
+            font-weight: 900;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .mylogo-contra {
             font-style: italic;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            color: #ffffff;
+        }
+        .mylogo-choice {
+            font-weight: 900;
+            color: #ba485b;
+        }
+        .mylogo-divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 0.3rem;
+        }
+        .mylogo-line {
+            width: 42px;
+            height: 1.5px;
+            background: #f4c1cc;
+            opacity: 0.9;
+        }
+        .mylogo-diamond {
+            width: 6px;
+            height: 6px;
+            background: #d36e7e;
+            transform: rotate(45deg);
+            border-radius: 1px;
         }
 
         .left-footer {
@@ -166,26 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             z-index: 2;
         }
 
-        .study-label {
-            font-size: 10px;
-            font-weight: 500;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: rgba(255,255,255,0.35);
-            margin-bottom: 10px;
-        }
-
-        .study-title {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 17px;
-            font-style: italic;
-            color: rgba(255,255,255,0.65);
-            line-height: 1.6;
-            max-width: 340px;
-        }
-
         .study-institution {
-            margin-top: 16px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -204,7 +233,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             letter-spacing: 0.05em;
         }
 
-        /* ── Right panel ── */
         .panel-right {
             flex: 1;
             display: flex;
@@ -249,7 +277,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             line-height: 1.6;
         }
 
-        /* Error */
         .error-box {
             background: #FDF0F0;
             border: 1px solid #F0CECE;
@@ -262,9 +289,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             gap: 10px;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Fields */
         .field-group {
             margin-bottom: 16px;
         }
@@ -314,7 +345,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 0 0 3px rgba(193,102,107,0.12);
         }
 
-        /* Submit */
         .btn-login {
             width: 100%;
             padding: 14px;
@@ -327,7 +357,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-weight: 500;
             cursor: pointer;
             margin-top: 8px;
-            transition: background 0.2s, transform 0.15s;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -337,49 +367,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .btn-login:hover {
             background: var(--rose-deep);
-            transform: translateY(-1px);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(158,74,79,0.3);
         }
 
         .btn-login:active {
             transform: translateY(0);
         }
 
-        /* Divider & back */
-        .divider {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin: 24px 0 0;
+        @media (max-width: 1024px) {
+            .panel-left { width: 42%; padding: 40px 36px; }
+            .mylogo-brand { font-size: 42px; }
+            .mylogo-line { width: 34px; }
+            .panel-left::before { width: 400px; height: 400px; bottom: -140px; right: -140px; }
+            .panel-left::after { width: 250px; height: 250px; bottom: -60px; right: -60px; }
+            .ring-extra { width: 120px; height: 120px; bottom: 30px; right: 15px; }
         }
-
-        .divider hr {
-            flex: 1;
-            border: none;
-            border-top: 1px solid var(--border);
-        }
-
-        .divider span {
-            font-size: 11px;
-            color: var(--muted);
-        }
-
-        .back-link {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-top: 16px;
-            font-size: 13px;
-            color: var(--muted);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .back-link:hover {
-            color: var(--rose);
-        }
-
-        /* Responsive */
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; }
             .panel-left {
@@ -387,16 +390,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 padding: 36px 28px 32px;
                 min-height: auto;
             }
-            .brand-name { font-size: 40px; }
+            .mylogo-brand { font-size: 38px; }
+            .mylogo-line { width: 32px; }
             .left-footer { margin-top: 24px; }
-            .study-title { font-size: 15px; }
             .panel-right { padding: 32px 24px; }
         }
     </style>
 </head>
 <body>
 
-<!-- Left decorative panel -->
 <div class="panel-left">
     <div class="dot-grid"></div>
     <div class="ring-extra"></div>
@@ -406,26 +408,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="dot"></div>
             <span>Admin Portal</span>
         </div>
-        <div class="brand-name">Contra<em>Choice</em></div>
-    </div>
-
-    <div class="left-footer">
-        <!-- <div class="study-label">Research Study</div>
-        <div class="study-title">
-            A Modern Birth Control Information System and Its Effect on Contraceptive Knowledge,
-            Decision-Making, and User Satisfaction among Women
-        </div> -->
-        <div class="study-institution">
-            <div class="inst-bar"></div>
-            <!-- <div class="inst-name">SEAIT</div> -->
+        <div class="mylogo-wrapper">
+            <div class="mylogo-brand">
+                <span class="mylogo-contra">Contra</span><span class="mylogo-choice">Choice</span>
+            </div>
+            <div class="mylogo-divider">
+                <span class="mylogo-line"></span>
+                <span class="mylogo-diamond"></span>
+                <span class="mylogo-line"></span>
+            </div>
         </div>
     </div>
+
 </div>
 
 <div class="panel-right">
     <div class="login-box">
 
-        <!-- <div class="login-eyebrow">Secure Access</div> -->
         <div class="login-heading">Welcome back,<br>Administrator</div>
         <div class="login-sub">Sign in to manage contraceptive methods and system content.</div>
 
