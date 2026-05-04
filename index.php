@@ -1,19 +1,29 @@
 <?php
-$methods = [
-    ['method_id'=>1,'name'=>'Combined Oral Contraceptive Pill','category'=>'hormonal','effectiveness'=>91.0,'is_hormone_free'=>0,'cost_level'=>'low','description'=>'A daily pill containing estrogen and progestin that prevents ovulation. Must be taken at the same time each day.','image_path'=>'method_69ee137dee9d45.91497925.png'],
-    ['method_id'=>2,'name'=>'Progestin-Only Pill (Mini-pill)','category'=>'hormonal','effectiveness'=>91.0,'is_hormone_free'=>0,'cost_level'=>'low','description'=>'A daily pill containing only progestin. Safe for smokers and breastfeeding women. Must be taken at the same time every day.','image_path'=>'method_69edf1908b4f21.42911926.png'],
-    ['method_id'=>3,'name'=>'Hormonal IUD (Mirena)','category'=>'long_term','effectiveness'=>99.8,'is_hormone_free'=>0,'cost_level'=>'high','description'=>'A small T-shaped device inserted into the uterus that releases progestin. Provides 5–8 years of protection.','image_path'=>null],
-    ['method_id'=>4,'name'=>'Copper IUD (Non-hormonal)','category'=>'long_term','effectiveness'=>99.2,'is_hormone_free'=>1,'cost_level'=>'high','description'=>'A hormone-free T-shaped copper device inserted into the uterus. Provides up to 10 years of protection.','image_path'=>'method_69ee1f4d251638.28750785.png'],
-    ['method_id'=>5,'name'=>'Injectable Contraceptive (DMPA)','category'=>'hormonal','effectiveness'=>94.0,'is_hormone_free'=>0,'cost_level'=>'low','description'=>'A progestin injection given every 3 months by a healthcare provider. No daily action needed.','image_path'=>'method_69edf0cc553b69.73734967.png'],
-    ['method_id'=>6,'name'=>'Condom','category'=>'barrier','effectiveness'=>85.0,'is_hormone_free'=>1,'cost_level'=>'low','description'=>'A barrier method that physically prevents sperm from reaching the egg. Also protects against STIs.','image_path'=>'method_69edf030321bf2.91001363.jpeg'],
-    ['method_id'=>7,'name'=>'Contraceptive Implant (Implanon)','category'=>'long_term','effectiveness'=>99.9,'is_hormone_free'=>0,'cost_level'=>'high','description'=>'A small rod inserted under the skin of the upper arm that releases progestin. Provides up to 3 years of protection.','image_path'=>null],
-    ['method_id'=>8,'name'=>'Fertility Awareness Method','category'=>'natural','effectiveness'=>76.0,'is_hormone_free'=>1,'cost_level'=>'low','description'=>'Tracking menstrual cycles, basal body temperature, and cervical mucus to identify fertile days.','image_path'=>null],
-    ['method_id'=>9,'name'=>'Diaphragm with Spermicide','category'=>'barrier','effectiveness'=>88.0,'is_hormone_free'=>1,'cost_level'=>'medium','description'=>'A dome-shaped silicone cup inserted to cover the cervix, used with spermicide.','image_path'=>'method_69edfecb6d2919.22545895.png'],
-    ['method_id'=>10,'name'=>'Emergency Contraceptive Pill','category'=>'emergency','effectiveness'=>85.0,'is_hormone_free'=>0,'cost_level'=>'medium','description'=>'A high-dose hormonal pill taken within 72 hours after unprotected sex to prevent pregnancy.','image_path'=>null],
-    ['method_id'=>11,'name'=>'Bilateral Tubal Ligation','category'=>'long_term','effectiveness'=>99.5,'is_hormone_free'=>1,'cost_level'=>'high','description'=>'A permanent surgical procedure that blocks or removes the fallopian tubes.','image_path'=>null],
+session_start();
+include 'includes/db_connection.php';
+
+$methods = [];
+$result = $conn->query("SELECT * FROM contraceptive_methods ORDER BY method_id");
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $methods[] = $row;
+    }
+}
+
+$category_labels = [
+    'hormonal' => 'Hormonal',
+    'barrier' => 'Barrier',
+    'long_term' => 'Long-Term',
+    'natural' => 'Natural',
+    'emergency' => 'Emergency'
 ];
-$category_labels = ['hormonal'=>'Hormonal','barrier'=>'Barrier','long_term'=>'Long-Term','natural'=>'Natural','emergency'=>'Emergency'];
-$cat_icons = ['hormonal'=>'fa-pills','barrier'=>'fa-shield-halved','long_term'=>'fa-clock','natural'=>'fa-leaf','emergency'=>'fa-bolt'];
+$cat_icons = [
+    'hormonal' => 'fa-pills',
+    'barrier' => 'fa-shield-halved',
+    'long_term' => 'fa-clock',
+    'natural' => 'fa-leaf',
+    'emergency' => 'fa-bolt'
+];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -352,20 +362,6 @@ nav{
 .t-med{background:var(--rose-pale);color:var(--rose);border:1px solid var(--rose-soft);}
 .t-high{background:var(--bg3);color:var(--ink3);border:1px solid var(--line);}
 
-.sec-cta{
-    background:linear-gradient(150deg,var(--rose-pale) 0%,#fff 60%,var(--teal-soft) 100%);
-    padding:110px 48px;text-align:center;position:relative;overflow:hidden;
-}
-.cta-line{width:1px;height:56px;margin:0 auto 28px;background:linear-gradient(to bottom,transparent,var(--rose-mid));}
-.cta-inner{max-width:520px;margin:0 auto;}
-.cta-inner h2{
-    font-family:'Playfair Display',serif;
-    font-size:clamp(30px,4.5vw,50px);font-weight:400;
-    color:var(--ink);line-height:1.15;margin-bottom:16px;
-}
-.cta-inner h2 em{font-style:normal;color:var(--rose);}
-.cta-inner p{font-size:14px;font-weight:300;color:var(--ink3);line-height:1.8;margin-bottom:32px;}
-
 .sec-about{background:var(--bg);}
 .about-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:72px;align-items:start;}
 .about-list{display:flex;flex-direction:column;gap:28px;}
@@ -411,7 +407,6 @@ nav{
     .steps{grid-template-columns:1fr;}
     .step{border-right:none;border-bottom:1px solid var(--line);}
     .mgrid{grid-template-columns:repeat(2,1fr);gap:12px;}
-    .sec-cta{padding:72px 24px;}
     .disc{padding:22px 24px;}
 }
 @media(max-width:480px){.mgrid{grid-template-columns:1fr;}}
@@ -538,17 +533,6 @@ nav{
             </div>
             <?php endforeach; ?>
         </div>
-    </div>
-</div>
-
-<div class="divider"></div>
-
-<div class="sec-cta">
-    <div class="cta-line"></div>
-    <div class="cta-inner reveal">
-        <h2>Not sure where<br>to <em>start?</em></h2>
-        <p>Login to access your personalized questionnaire and get contraceptive options ranked by how well they fit your profile.</p>
-        <a href="/hci/user/login.php" class="btn-primary">Login to Get Started</a>
     </div>
 </div>
 
