@@ -62,26 +62,67 @@ if ($user_id == 0 && $_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$sort = $_GET['sort'] ?? 'newest';
+$sort     = $_GET['sort'] ?? 'newest';
 $order_by = ($sort === 'oldest') ? 'ASC' : 'DESC';
+$search   = trim($_GET['search'] ?? '');
 
-$page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$page     = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
 $per_page = 10;
-$offset = ($page - 1) * $per_page;
+$offset   = ($page - 1) * $per_page;
 
-$total_result = $conn->query("SELECT COUNT(*) as total FROM forum_posts");
-$total_posts = $total_result->fetch_assoc()['total'];
+if ($search !== '') {
+    $like = '%' . $search . '%';
+
+    $count_stmt = $conn->prepare("
+        SELECT COUNT(DISTINCT fp.post_id) as total
+        FROM forum_posts fp
+        LEFT JOIN forum_replies fr ON fr.post_id = fp.post_id
+        WHERE fp.content LIKE ? OR fr.content LIKE ?
+    ");
+    $count_stmt->bind_param("ss", $like, $like);
+    $count_stmt->execute();
+    $total_posts = $count_stmt->get_result()->fetch_assoc()['total'];
+    $count_stmt->close();
+
+    $posts_stmt = $conn->prepare("
+        SELECT DISTINCT fp.*
+        FROM forum_posts fp
+        LEFT JOIN forum_replies fr ON fr.post_id = fp.post_id
+        WHERE fp.content LIKE ? OR fr.content LIKE ?
+        ORDER BY fp.created_at $order_by
+        LIMIT ? OFFSET ?
+    ");
+    $posts_stmt->bind_param("ssii", $like, $like, $per_page, $offset);
+    $posts_stmt->execute();
+    $posts = $posts_stmt->get_result();
+    $posts_stmt->close();
+} else {
+    $total_result = $conn->query("SELECT COUNT(*) as total FROM forum_posts");
+    $total_posts  = $total_result->fetch_assoc()['total'];
+
+    $posts_stmt = $conn->prepare("
+        SELECT * FROM forum_posts
+        ORDER BY created_at $order_by
+        LIMIT ? OFFSET ?
+    ");
+    $posts_stmt->bind_param("ii", $per_page, $offset);
+    $posts_stmt->execute();
+    $posts = $posts_stmt->get_result();
+    $posts_stmt->close();
+}
+
 $total_pages = ceil($total_posts / $per_page);
 
-$posts_query = "
-    SELECT * FROM forum_posts
-    ORDER BY created_at $order_by
-    LIMIT ? OFFSET ?
-";
-$stmt = $conn->prepare($posts_query);
-$stmt->bind_param("ii", $per_page, $offset);
-$stmt->execute();
-$posts = $stmt->get_result();
+function highlight($text, $keyword) {
+    if (empty($keyword)) return htmlspecialchars($text);
+    $escaped_keyword = preg_quote($keyword, '/');
+    $highlighted = preg_replace(
+        '/(' . $escaped_keyword . ')/i',
+        '<mark class="search-highlight">$1</mark>',
+        htmlspecialchars($text)
+    );
+    return $highlighted;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -147,24 +188,10 @@ $posts = $stmt->get_result();
       color: var(--muted);
       font-family: 'Quicksand', sans-serif;
     }
-    .topbar b {
-      color: var(--brown);
-      font-weight: 700;
-    }
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 600;
-    }
-    .topbar-sep {
-      color: var(--border);
-      font-size: 16px;
-    }
-    .topbar-page {
-      color: var(--muted);
-      font-weight: 500;
-    }
+    .topbar b { color: var(--brown); font-weight: 700; }
+    .topbar-left { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .topbar-sep { color: var(--border); font-size: 16px; }
+    .topbar-page { color: var(--muted); font-weight: 500; }
 
     .content-area {
       flex: 1;
@@ -179,7 +206,7 @@ $posts = $stmt->get_result();
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       gap: 16px;
     }
     .forum-header h1 {
@@ -189,7 +216,7 @@ $posts = $stmt->get_result();
       color: var(--brown-d);
       margin: 0;
     }
-    .forum-actions { display: flex; gap: 12px; align-items: center; }
+    .forum-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
     .sort-select {
       background: var(--surface);
       border: 1.5px solid var(--border);
@@ -212,6 +239,86 @@ $posts = $stmt->get_result();
       box-shadow: 0 3px 10px rgba(125,90,74,.3);
     }
     .btn-new-post:hover { background: var(--brown-d); transform: translateY(-1px); }
+
+    .search-bar-wrap {
+      margin-bottom: 24px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .search-bar-wrap form {
+      display: flex;
+      flex: 1;
+      gap: 10px;
+      align-items: center;
+    }
+    .search-input {
+      flex: 1;
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      padding: 10px 20px;
+      font-size: 13px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 500;
+      color: var(--text);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--brown);
+      box-shadow: 0 0 0 3px rgba(125,90,74,.10);
+    }
+    .search-input::placeholder { color: var(--muted); }
+    .btn-search {
+      background: var(--brown);
+      border: none;
+      border-radius: 40px;
+      padding: 10px 22px;
+      color: white;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-search:hover { background: var(--brown-d); }
+    .btn-clear-search {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: 40px;
+      padding: 9px 18px;
+      color: var(--brown);
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .btn-clear-search:hover { background: var(--surface-2); color: var(--brown-d); }
+
+    .search-result-info {
+      background: var(--accent-lav);
+      border: 1.5px solid var(--accent-lav-d);
+      border-radius: 14px;
+      padding: 10px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-lav-d);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    mark.search-highlight {
+      background: #ffe082;
+      color: var(--brown-d);
+      border-radius: 4px;
+      padding: 0 2px;
+      font-weight: 700;
+    }
 
     .forum-card {
       background: var(--surface);
@@ -238,10 +345,7 @@ $posts = $stmt->get_result();
       cursor: pointer;
       transition: color 0.15s;
     }
-    .reply-count-clickable:hover {
-      color: var(--brown);
-      text-decoration: underline;
-    }
+    .reply-count-clickable:hover { color: var(--brown); text-decoration: underline; }
     .anonymous-badge {
       background: var(--surface-2);
       padding: 3px 12px;
@@ -267,9 +371,7 @@ $posts = $stmt->get_result();
       background: var(--surface-2);
       display: none;
     }
-    .reply-section.open {
-      display: block;
-    }
+    .reply-section.open { display: block; }
     .reply-list {
       margin-bottom: 20px;
       max-height: 350px;
@@ -297,12 +399,7 @@ $posts = $stmt->get_result();
       margin-bottom: 8px;
       font-weight: 500;
     }
-    .star-rating {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 6px;
-    }
+    .star-rating { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
     .star-rating form { display: flex; align-items: center; gap: 2px; }
     .star-btn {
       background: none;
@@ -314,15 +411,9 @@ $posts = $stmt->get_result();
       color: #d1cfc6;
       transition: color 0.15s, transform 0.1s;
     }
-    .star-btn:hover,
-    .star-btn.active { color: #f0a500; }
+    .star-btn:hover, .star-btn.active { color: #f0a500; }
     .star-btn:hover { transform: scale(1.2); }
-    .star-avg {
-      font-size: 11px;
-      color: var(--muted);
-      margin-left: 4px;
-      font-weight: 600;
-    }
+    .star-avg { font-size: 11px; color: var(--muted); margin-left: 4px; font-weight: 600; }
     .reply-form textarea {
       width: 100%;
       border: 1.5px solid var(--border);
@@ -363,10 +454,7 @@ $posts = $stmt->get_result();
       border-radius: 30px;
       transition: background 0.15s;
     }
-    .close-replies-btn:hover {
-      background: var(--surface);
-      color: var(--brown);
-    }
+    .close-replies-btn:hover { background: var(--surface); color: var(--brown); }
     .alert-custom {
       background: #eaf3de;
       border-radius: 16px;
@@ -397,11 +485,7 @@ $posts = $stmt->get_result();
       transition: all 0.15s;
     }
     .pagination a:hover { background: var(--surface-2); border-color: var(--brown); color: var(--brown-d); }
-    .pagination .active {
-      background: var(--brown);
-      color: white;
-      border-color: var(--brown);
-    }
+    .pagination .active { background: var(--brown); color: white; border-color: var(--brown); }
     .empty-forum {
       text-align: center;
       padding: 60px 24px;
@@ -410,11 +494,7 @@ $posts = $stmt->get_result();
       border: 1.5px solid var(--border);
     }
     .empty-forum i { font-size: 52px; color: var(--muted); margin-bottom: 16px; }
-    .modal-custom .modal-content {
-      border-radius: 24px;
-      border: none;
-      background: var(--surface);
-    }
+    .modal-custom .modal-content { border-radius: 24px; border: none; background: var(--surface); }
     .modal-custom .modal-header { border-bottom: 1.5px solid var(--border); padding: 20px 26px; }
     .modal-custom .modal-body { padding: 26px; }
     .modal-custom .form-control {
@@ -455,7 +535,7 @@ $posts = $stmt->get_result();
       <div class="forum-header">
         <h1><i class="fas fa-comments me-2"></i> Anonymous Community Forum</h1>
         <div class="forum-actions">
-          <select class="sort-select" onchange="window.location.href='?sort='+this.value+'&page=1'">
+          <select class="sort-select" onchange="window.location.href='?sort='+this.value+'&page=1&search=<?= urlencode($search) ?>'">
             <option value="newest" <?= $sort === 'newest' ? 'selected' : '' ?>>Newest first</option>
             <option value="oldest" <?= $sort === 'oldest' ? 'selected' : '' ?>>Oldest first</option>
           </select>
@@ -465,16 +545,55 @@ $posts = $stmt->get_result();
         </div>
       </div>
 
+      <div class="search-bar-wrap">
+        <form method="GET" action="">
+          <input type="hidden" name="sort" value="<?= htmlspecialchars($sort) ?>">
+          <input type="hidden" name="page" value="1">
+          <input
+            type="text"
+            name="search"
+            class="search-input"
+            placeholder="Search..."
+            value="<?= htmlspecialchars($search) ?>"
+            autocomplete="off"
+          >
+          <button type="submit" class="btn-search"><i class="fas fa-search me-1"></i> Search</button>
+          <?php if ($search !== ''): ?>
+            <a href="?sort=<?= urlencode($sort) ?>&page=1" class="btn-clear-search"><i class="fas fa-times me-1"></i> Clear</a>
+          <?php endif; ?>
+        </form>
+      </div>
+
+      <?php if ($search !== ''): ?>
+        <div class="search-result-info">
+          <i class="fas fa-search"></i>
+          Showing <strong><?= $total_posts ?></strong> result<?= $total_posts != 1 ? 's' : '' ?> for keyword: <strong>"<?= htmlspecialchars($search) ?>"</strong>
+        </div>
+      <?php endif; ?>
+
       <?php if ($posts->num_rows === 0): ?>
         <div class="empty-forum">
-          <i class="fas fa-comment-dots"></i>
-          <h4>No questions yet</h4>
-          <p class="text-muted">Be the first to ask anonymously about contraceptives, family planning, or women's health.</p>
-          <button class="btn-new-post mt-2" data-bs-toggle="modal" data-bs-target="#postModal">📝 Start a discussion</button>
+          <i class="fas fa-<?= $search !== '' ? 'search' : 'comment-dots' ?>"></i>
+          <h4><?= $search !== '' ? 'No results found' : 'No questions yet' ?></h4>
+          <p class="text-muted">
+            <?php if ($search !== ''): ?>
+              No posts or replies matched "<strong><?= htmlspecialchars($search) ?></strong>". Try a different keyword.
+            <?php else: ?>
+              Be the first to ask anonymously about contraceptives, family planning, or women's health.
+            <?php endif; ?>
+          </p>
+          <?php if ($search === ''): ?>
+            <button class="btn-new-post mt-2" data-bs-toggle="modal" data-bs-target="#postModal">📝 Start a discussion</button>
+          <?php endif; ?>
         </div>
       <?php else: ?>
 
-        <?php while ($post = $posts->fetch_assoc()):
+        <?php
+        $posts_array = [];
+        while ($row = $posts->fetch_assoc()) {
+            $posts_array[] = $row;
+        }
+        foreach ($posts_array as $post):
           $post_id = $post['post_id'];
           $reply_stmt = $conn->prepare("
             SELECT r.*,
@@ -502,7 +621,7 @@ $posts = $stmt->get_result();
             </div>
           </div>
           <div class="post-content">
-            <?= nl2br(htmlspecialchars($post['content'])) ?>
+            <?= nl2br(highlight($post['content'], $search)) ?>
           </div>
           <div class="reply-section" id="replies-<?= $post_id ?>">
             <div class="reply-section-header">
@@ -525,7 +644,7 @@ $posts = $stmt->get_result();
                     <span class="anonymous-badge"><i class="fas fa-user-secret"></i> Anonymous</span>
                     <span><i class="far fa-clock"></i> <?= date('M d, Y g:i A', strtotime($reply['created_at'])) ?></span>
                   </div>
-                  <div class="reply-content"><?= nl2br(htmlspecialchars($reply['content'])) ?></div>
+                  <div class="reply-content"><?= nl2br(highlight($reply['content'], $search)) ?></div>
                   <div class="star-rating">
                     <form method="POST" style="display:flex;align-items:center;gap:2px;">
                       <input type="hidden" name="action"   value="rate_reply">
@@ -565,23 +684,23 @@ $posts = $stmt->get_result();
             </form>
           </div>
         </div>
-        <?php $reply_stmt->close(); endwhile; ?>
+        <?php $reply_stmt->close(); endforeach; ?>
       <?php endif; ?>
 
       <?php if ($total_pages > 1): ?>
       <div class="pagination">
         <?php if ($page > 1): ?>
-          <a href="?sort=<?= $sort ?>&page=<?= $page-1 ?>"><i class="fas fa-chevron-left"></i> Previous</a>
+          <a href="?sort=<?= $sort ?>&page=<?= $page-1 ?>&search=<?= urlencode($search) ?>"><i class="fas fa-chevron-left"></i> Previous</a>
         <?php endif; ?>
         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
           <?php if ($i == $page): ?>
             <span class="active"><?= $i ?></span>
           <?php else: ?>
-            <a href="?sort=<?= $sort ?>&page=<?= $i ?>"><?= $i ?></a>
+            <a href="?sort=<?= $sort ?>&page=<?= $i ?>&search=<?= urlencode($search) ?>"><?= $i ?></a>
           <?php endif; ?>
         <?php endfor; ?>
         <?php if ($page < $total_pages): ?>
-          <a href="?sort=<?= $sort ?>&page=<?= $page+1 ?>">Next <i class="fas fa-chevron-right"></i></a>
+          <a href="?sort=<?= $sort ?>&page=<?= $page+1 ?>&search=<?= urlencode($search) ?>">Next <i class="fas fa-chevron-right"></i></a>
         <?php endif; ?>
       </div>
       <?php endif; ?>
